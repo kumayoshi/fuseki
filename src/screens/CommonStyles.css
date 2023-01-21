@@ -1,0 +1,96 @@
+body,
+.wrap {
+  background-color: #fafafa;
+  color: #434343;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+div,
+p,
+input,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style: none;
+}
+
+input,
+textarea {
+  border: none;
+  background-color: none;
+  -webkit-appearance: none;
+}
+
+input[type="submit"],
+input[type="button"] {
+  border-radius: 0;
+  -webkit-box-sizing: content-box;
+  -webkit-appearance: button;
+  appearance: button;
+  border: none;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+input[type="submit"]::-webkit-search-decoration,
+input[type="button"]::-webkit-search-decoration {
+  display: none;
+}
+input[type="submit"]::focus,
+input[type="button"]::focus {
+  outline-offset: -2px;
+}
+
+img {
+  vertical-align: bottom;
+  max-width: 100%;
+  width: 100%;
+}
+
+figure {
+  margin: 0;
+}
+
+.container {
+  width: 90%;
+  margin: 0 auto;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  padding: 9vw 7% 2vw;
+  z-index: 10;
+  box-sizing: border-box;
+  background-color: #fafafa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  font-size: 4.25vw;
+  text-align: center;
+  margin: 0;
+}
+
+header figure {
+  width: 8%;
+}
+
+header .auth_link {
+  width: 8%;
+}
+
+.text_link {
+  color: #5bcbcb;
+}
