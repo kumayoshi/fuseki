@@ -98,7 +98,7 @@ const SignUpPage = () => {
             />;
           })}
         </ul>
-        <a href={"/article/"}>新規メモ作成ページへ</a>
+        <a href={"/article/"}>新規メモ作成ページに</a>
         <a href={"/auth/"}>アカウント設定ページへ</a>
       </div>
     </div>
