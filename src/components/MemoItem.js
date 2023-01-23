@@ -1,6 +1,7 @@
 import React from "react";
 
-const Header = ({ memoText, stone, categoryText, memoDate }) => {
+const MemoItem = ({ memoText, stone, categoryText, memoDate }) => {
+  console.log(22);
   return (
     <li style={styles.ItemWrap}>
       <p>
@@ -15,7 +16,7 @@ const Header = ({ memoText, stone, categoryText, memoDate }) => {
   );
 };
 
-export default Header;
+export default MemoItem;
 
 const styles = {
   ItemWrap: {

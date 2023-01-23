@@ -27,6 +27,7 @@ import StoneUsuki from "../assets/images/stone_usuki.png";
 import StoneUsumomo from "../assets/images/stone_usumomo.png";
 
 const SignUpPage = () => {
+  // メモ一覧の記事データベース
   const MemoList = [
     {
       userId: 1,
@@ -39,6 +40,7 @@ const SignUpPage = () => {
     },
   ];
 
+  // 各登録済みカテゴリのデータベース
   const CategoryList = [
     {
       categoryId: 1,
@@ -77,24 +79,26 @@ const SignUpPage = () => {
       stoneImg: StoneAka,
     },
   ];
+
+  // メモ取得の際にカテゴリを検索
   const ItemCategoryFind = (ItemCategoryID) => {
-    return CategoryList.categoryId === ItemCategoryID;
+    return CategoryList.find(
+      (cateitem) => cateitem.categoryId === ItemCategoryID
+    );
   };
+
   return (
     <div className={CommonStyles.wrap}>
       <Header currentPage="メモ一覧" user="" />
       <div style={styles.wrap}>
         <ul>
-          {MemoList.map((item, index) => {
-            const ItemCategory = CategoryList.find(
-              ItemCategoryFind(item.categoryId)
-            );
+          {MemoList.forEach((item) => {
+            const ItemCategory = ItemCategoryFind(item.categoryId);
             <MemoItem
               memoText={item.title}
               stone={ItemCategory.stoneImg}
               categoryText={ItemCategory.categoryName}
               memoDate={item.date}
-              key={index}
             />;
           })}
         </ul>
