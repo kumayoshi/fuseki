@@ -55,16 +55,10 @@ const MemoFilter = ({
                   );
                 }
               })}
-              <button
-                style={styles.FindModalCategoryItembottom}
-                onClick={() => categoryFilterOn(55)}
-              >
-                <img src={Stone} alt="" />
-              </button>
             </div>
             <button
               style={styles.FindModalFilterNonButton}
-              onClick={() => modalTypeChanged("none")}
+              onClick={() => categoryFilterOn("none_category")}
             >
               指定しない
             </button>

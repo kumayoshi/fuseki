@@ -128,18 +128,14 @@ const SignUpPage = () => {
   // category検索時　category内 categoryId検索
   // ---------- categoryId　無い場合はこの関数内でリセットする
   const categoryFilterOn = (currentCategoryId) => {
-    const categoryFilterMemoList = memoList.filter(
-      (memoListItem) => memoListItem.categoryId === currentCategoryId
-    );
-    console.log("categoryFilterMemoList : ", categoryFilterMemoList);
-    // if(  ){
-
-    // }
-    // SetMemoListChaged(categoryFilterMemoList);
-  };
-
-  const categoryFilterNon = () => {
-    setModalType("none");
+    if (currentCategoryId !== "none_category") {
+      const categoryFilterMemoList = memoList.filter(
+        (memoListItem) => memoListItem.categoryId === currentCategoryId
+      );
+      SetMemoListChaged(categoryFilterMemoList);
+    } else {
+      SetMemoListChaged(memoList);
+    }
   };
 
   useEffect(() => {
@@ -176,7 +172,7 @@ const SignUpPage = () => {
           categoryFilterOn={(categoryFilter) =>
             categoryFilterOn(categoryFilter)
           }
-          categoryFilterNon={() => categoryFilterNon()}
+          // categoryFilterNon={() => categoryFilterNon()}
           modalTypeChanged={(type) => modalTypeChanged(type)}
           modalType={modalType}
         />
