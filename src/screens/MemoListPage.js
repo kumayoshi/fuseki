@@ -17,7 +17,7 @@ import StoneKi from "../assets/images/stone_ki.png";
 
 const SignUpPage = () => {
   // メモ一覧の記事データベース
-  const MemoList = [
+  const memoList = [
     {
       userId: 1,
       itemId: 1,
@@ -36,10 +36,31 @@ const SignUpPage = () => {
       date: "2023/1/27 10:00",
       categoryId: 5,
     },
+    {
+      userId: 1,
+      itemId: 3,
+      title: "遊びとは自由であることだ",
+      text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
+      trigger: "超相対性理論を聞いてのメモ",
+      date: "2023/1/27 10:00",
+      categoryId: 3,
+    },
+    {
+      userId: 1,
+      itemId: 3,
+      title:
+        "仕事を楽しんでやっているという人は自由に生きるリテラシーを持っている",
+      text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
+      trigger: "超相対性理論を聞いてのメモ",
+      date: "2023/1/27 10:00",
+      categoryId: 4,
+    },
   ];
 
+  const [memoListChaged, SetMemoListChaged] = useState(memoList);
+
   // 各登録済みカテゴリのデータベース
-  const CategoryList = [
+  const categoryList = [
     {
       categoryId: 1,
       categoryName: "それ素敵",
@@ -78,43 +99,69 @@ const SignUpPage = () => {
     },
   ];
 
-  const date = [
+  const userList = [
     {
       userId: 1,
-      year: ["2022", "2023"],
-      month: {
-        2022: ["10", "11", "12"],
-        2023: ["1"],
-      },
+      dateList: {},
+      categoryList: [1, 5],
+    },
+    {
+      userId: 2,
+      dateList: {},
+      categoryList: [2, 3],
     },
   ];
 
-  // メモ取得の際にカテゴリを検索
-  const ItemCategoryFind = (ItemCategoryID) => {
-    return CategoryList.find(
-      (cateitem) => cateitem.categoryId === ItemCategoryID
+  // メモ取得の際にカテゴリ配列から該当するカテゴリだけを検索
+  const itemCategoryFind = (itemCategoryID) => {
+    return categoryList.find(
+      (cateitem) => cateitem.categoryId === itemCategoryID
     );
   };
 
-  // 検索時のdate内 userId検索
-  // const ItemCategoryFind = (ItemCategoryID) => {
-  //   return CategoryList.find(
-  //     (cateitem) => cateitem.categoryId === ItemCategoryID
-  //   );
-  // };
+  //
+  const [modalType, setModalType] = useState("none"); // none , date , category
+  const modalTypeChanged = (type) => {
+    type === modalType ? setModalType("none") : setModalType(type);
+  };
+
+  // category検索時　category内 categoryId検索
+  // ---------- categoryId　無い場合はこの関数内でリセットする
+  const categoryFilterOn = (currentCategoryId) => {
+    const categoryFilterMemoList = memoList.filter(
+      (memoListItem) => memoListItem.categoryId === currentCategoryId
+    );
+    console.log("categoryFilterMemoList : ", categoryFilterMemoList);
+    // if(  ){
+
+    // }
+    // SetMemoListChaged(categoryFilterMemoList);
+  };
+
+  const categoryFilterNon = () => {
+    setModalType("none");
+  };
+
+  useEffect(() => {
+    return;
+  }, [memoListChaged]);
+
+  // const CategoryFilterChange = useEffect(() => {
+  //   console.log();
+  // },[categoryFilter]);
 
   return (
     <div className={CommonStyles.wrap}>
       <Header currentPage="メモ一覧" user="" />
       <div style={styles.wrap}>
         <ul>
-          {MemoList.map((item, index) => {
-            const ItemCategory = ItemCategoryFind(item.categoryId);
+          {memoListChaged.map((item, index) => {
+            const itemCategory = itemCategoryFind(item.categoryId);
             return (
               <MemoItem
                 memoText={item.title}
-                stone={ItemCategory.stoneImg}
-                categoryText={ItemCategory.categoryName}
+                stone={itemCategory.stoneImg}
+                categoryText={itemCategory.categoryName}
                 memoDate={item.date}
                 key={index}
               />
@@ -124,7 +171,15 @@ const SignUpPage = () => {
         <a href={"/article/"}>新規メモ作成ページに</a>
         <a href={"/auth/"}>アカウント設定ページへ</a>
 
-        <MemoFilter />
+        <MemoFilter
+          categoryList={categoryList}
+          categoryFilterOn={(categoryFilter) =>
+            categoryFilterOn(categoryFilter)
+          }
+          categoryFilterNon={() => categoryFilterNon()}
+          modalTypeChanged={(type) => modalTypeChanged(type)}
+          modalType={modalType}
+        />
       </div>
     </div>
   );
