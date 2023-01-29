@@ -1,27 +1,60 @@
 import React from "react";
 
-const Header = ({ memoText, stone, categoryText, memoDate }) => {
+const MemoItem = ({ memoText, stone, categoryText, memoDate }) => {
   return (
     <li style={styles.ItemWrap}>
-      <p>
-        <i>
-          <img src={stone} alt="" />
-        </i>
-        {memoText}
-      </p>
-      <p>{categoryText}</p>
-      <p>{memoDate}</p>
+      <a style={styles.ItemWrapIn} href={"/article/"}>
+        <p style={styles.ItemTitleWrap}>
+          <i style={styles.CategoryStone}>
+            <img src={stone} alt="" />
+          </i>
+          <span style={styles.ItemTitle}>{memoText}</span>
+        </p>
+        <p style={styles.CategoryText}>{categoryText}</p>
+        <p style={styles.DateText}>{memoDate}</p>
+      </a>
     </li>
   );
 };
 
-export default Header;
+export default MemoItem;
 
 const styles = {
   ItemWrap: {
-    borderRadius: "5px",
+    borderRadius: "3vw",
     background: "#fff",
+    marginTop: "2.5vw",
+  },
+  ItemWrapIn: {
+    display: "block",
     boxSizing: "border-box",
-    padding: "10px",
+    padding: "2vw 4vw 3vw 2vw",
+    color: "initial",
+  },
+  ItemTitleWrap: {
+    display: "flex",
+    alignItems: "center",
+  },
+  ItemTitle: {
+    fontWeight: "bold",
+    width: "100%",
+    color: "#434343",
+  },
+  CategoryStone: {
+    minWidth: "12vw",
+    width: "12vw",
+    marginRight: "3%",
+    padding: "1.5vw",
+    boxSizing: "border-box",
+  },
+  CategoryText: {
+    color: "rgba(67,67,67,0.5)",
+    fontSize: "3.3vw",
+    paddingLeft: "3vw",
+  },
+  DateText: {
+    color: "rgba(67,67,67,0.5)",
+    fontSize: "3.3vw",
+    textAlign: "right",
   },
 };

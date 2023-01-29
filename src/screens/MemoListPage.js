@@ -6,28 +6,18 @@ import Header from "../components/Header";
 // import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { Navigate } from "react-router-dom";
 import MemoItem from "../components/MemoItem";
-
+import MemoFilter from "../components/MemoFilter";
+// 各カテゴエリー石の画像
 import Stone from "../assets/images/stone.png";
 import StoneMomo from "../assets/images/stone_momo.png";
 import StoneAka from "../assets/images/stone_aka.png";
-import StoneAkacha from "../assets/images/stone_akacha.png";
-import StoneAkaki from "../assets/images/stone_akaki.png";
-import StoneAo from "../assets/images/stone_ao.png";
 import StoneAomidori from "../assets/images/stone_aomidori.png";
 import StoneAsagi from "../assets/images/stone_asagi.png";
-import StoneCha from "../assets/images/stone_cha.png";
 import StoneKi from "../assets/images/stone_ki.png";
-import StoneKimidori from "../assets/images/stone_kimidori.png";
-import StoneKoke from "../assets/images/stone_koke.png";
-import StoneOrange from "../assets/images/stone_orange.png";
-import StoneOre from "../assets/images/stone_ore.png";
-import StonePurple from "../assets/images/stone_purple.png";
-import StoneSinku from "../assets/images/stone_sinku.png";
-import StoneUsuki from "../assets/images/stone_usuki.png";
-import StoneUsumomo from "../assets/images/stone_usumomo.png";
 
 const SignUpPage = () => {
-  const MemoList = [
+  // メモ一覧の記事データベース
+  const memoList = [
     {
       userId: 1,
       itemId: 1,
@@ -37,9 +27,40 @@ const SignUpPage = () => {
       date: "2022/10/10 10:00",
       categoryId: 1,
     },
+    {
+      userId: 1,
+      itemId: 2,
+      title: "言語は人を分断し結合する",
+      text: "分けることもできれば、結束を生むこともできる",
+      trigger: "超相対性理論を聞いてのメモ",
+      date: "2023/1/27 10:00",
+      categoryId: 5,
+    },
+    {
+      userId: 1,
+      itemId: 3,
+      title: "遊びとは自由であることだ",
+      text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
+      trigger: "超相対性理論を聞いてのメモ",
+      date: "2023/1/27 10:00",
+      categoryId: 3,
+    },
+    {
+      userId: 1,
+      itemId: 3,
+      title:
+        "仕事を楽しんでやっているという人は自由に生きるリテラシーを持っている",
+      text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
+      trigger: "超相対性理論を聞いてのメモ",
+      date: "2023/1/27 10:00",
+      categoryId: 4,
+    },
   ];
 
-  const CategoryList = [
+  const [memoListChaged, SetMemoListChaged] = useState(memoList);
+
+  // 各登録済みカテゴリのデータベース
+  const categoryList = [
     {
       categoryId: 1,
       categoryName: "それ素敵",
@@ -77,29 +98,84 @@ const SignUpPage = () => {
       stoneImg: StoneAka,
     },
   ];
-  const ItemCategoryFind = (ItemCategoryID) => {
-    return CategoryList.categoryId === ItemCategoryID;
+
+  const userList = [
+    {
+      userId: 1,
+      dateList: {},
+      categoryList: [1, 5],
+    },
+    {
+      userId: 2,
+      dateList: {},
+      categoryList: [2, 3],
+    },
+  ];
+
+  // メモ取得の際にカテゴリ配列から該当するカテゴリだけを検索
+  const itemCategoryFind = (itemCategoryID) => {
+    return categoryList.find(
+      (cateitem) => cateitem.categoryId === itemCategoryID
+    );
   };
+
+  //
+  const [modalType, setModalType] = useState("none"); // none , date , category
+  const modalTypeChanged = (type) => {
+    type === modalType ? setModalType("none") : setModalType(type);
+  };
+
+  // category検索時　category内 categoryId検索
+  // ---------- categoryId　無い場合はこの関数内でリセットする
+  const categoryFilterOn = (currentCategoryId) => {
+    if (currentCategoryId !== "none_category") {
+      const categoryFilterMemoList = memoList.filter(
+        (memoListItem) => memoListItem.categoryId === currentCategoryId
+      );
+      SetMemoListChaged(categoryFilterMemoList);
+    } else {
+      SetMemoListChaged(memoList);
+    }
+  };
+
+  useEffect(() => {
+    return;
+  }, [memoListChaged]);
+
+  // const CategoryFilterChange = useEffect(() => {
+  //   console.log();
+  // },[categoryFilter]);
+
   return (
     <div className={CommonStyles.wrap}>
       <Header currentPage="メモ一覧" user="" />
       <div style={styles.wrap}>
         <ul>
-          {MemoList.map((item, index) => {
-            const ItemCategory = CategoryList.find(
-              ItemCategoryFind(item.categoryId)
+          {memoListChaged.map((item, index) => {
+            const itemCategory = itemCategoryFind(item.categoryId);
+            return (
+              <MemoItem
+                memoText={item.title}
+                stone={itemCategory.stoneImg}
+                categoryText={itemCategory.categoryName}
+                memoDate={item.date}
+                key={index}
+              />
             );
-            <MemoItem
-              memoText={item.title}
-              stone={ItemCategory.stoneImg}
-              categoryText={ItemCategory.categoryName}
-              memoDate={item.date}
-              key={index}
-            />;
           })}
         </ul>
         <a href={"/article/"}>新規メモ作成ページに</a>
         <a href={"/auth/"}>アカウント設定ページへ</a>
+
+        <MemoFilter
+          categoryList={categoryList}
+          categoryFilterOn={(categoryFilter) =>
+            categoryFilterOn(categoryFilter)
+          }
+          // categoryFilterNon={() => categoryFilterNon()}
+          modalTypeChanged={(type) => modalTypeChanged(type)}
+          modalType={modalType}
+        />
       </div>
     </div>
   );
@@ -118,7 +194,7 @@ const styles = {
   },
   wrap: {
     padding: "0px",
-    margin: "38vw auto 0",
+    margin: "25vw auto 0",
     width: "79%",
     borderRadius: "10px",
   },
