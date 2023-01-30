@@ -33,7 +33,7 @@ const SignUpPage = () => {
       title: "言語は人を分断し結合する",
       text: "分けることもできれば、結束を生むこともできる",
       trigger: "超相対性理論を聞いてのメモ",
-      date: "2023/1/27 10:00",
+      date: "2023/10/27 10:00",
       categoryId: 5,
     },
     {
@@ -42,7 +42,7 @@ const SignUpPage = () => {
       title: "遊びとは自由であることだ",
       text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
       trigger: "超相対性理論を聞いてのメモ",
-      date: "2023/1/27 10:00",
+      date: "2023/11/27 10:00",
       categoryId: 3,
     },
     {
@@ -52,7 +52,7 @@ const SignUpPage = () => {
         "仕事を楽しんでやっているという人は自由に生きるリテラシーを持っている",
       text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
       trigger: "超相対性理論を聞いてのメモ",
-      date: "2023/1/27 10:00",
+      date: "2023/12/27 10:00",
       categoryId: 4,
     },
   ];
@@ -102,12 +102,25 @@ const SignUpPage = () => {
   const userList = [
     {
       userId: 1,
-      dateList: {},
+      email: "yyy@example.com", //メールアドレス
+      password: "pass", //パスワード
+      dateList: {
+        year: ["2022", "2023"],
+        month: [
+          [10, 11, 12],
+          [1, 2],
+        ],
+      },
       categoryList: [1, 5],
     },
     {
       userId: 2,
-      dateList: {},
+      email: "yyy@example.com", //メールアドレス
+      password: "pass", //パスワード
+      dateList: {
+        year: ["2022", "2023"],
+        month: [[12], [1]],
+      },
       categoryList: [2, 3],
     },
   ];
@@ -125,21 +138,39 @@ const SignUpPage = () => {
     type === modalType ? setModalType("none") : setModalType(type);
   };
 
-  // category検索時　category内 categoryId検索
+  // category絞り込みcategory内 categoryId検索
   // ---------- categoryId　無い場合はこの関数内でリセットする
-  const categoryFilterOn = (currentCategoryId) => {
-    const categoryFilterMemoList = memoList.filter(
-      (memoListItem) => memoListItem.categoryId === currentCategoryId
+  const categoryFilter = (currentCategoryId) => {
+    if (currentCategoryId !== "none_filter") {
+      const filterMemoList = memoList.filter(
+        (memoListItem) => memoListItem.categoryId === currentCategoryId
+      );
+      SetMemoListChaged(filterMemoList);
+    } else {
+      modalTypeChanged("none");
+      setFilterYearLabel("-");
+      SetMemoListChaged(memoList);
+    }
+  };
+  // date絞り込み
+  // -----------年
+  const [filterYearLabel, setFilterYearLabel] = useState("-");
+  const filterYearChanged = (item) => {
+    const yearValue = item.target.value;
+    setFilterYearLabel(yearValue);
+    const filterMemoList = memoList.filter(
+      (memoListItem) => memoListItem.date.indexOf(yearValue) !== -1
     );
-    console.log("categoryFilterMemoList : ", categoryFilterMemoList);
-    // if(  ){
-
-    // }
-    // SetMemoListChaged(categoryFilterMemoList);
+    SetMemoListChaged(filterMemoList);
   };
 
-  const categoryFilterNon = () => {
-    setModalType("none");
+  // -----------月
+  const filterMonthChanged = (item) => {
+    const monthValue = filterYearLabel + "/" + item.target.value;
+    const filterMemoList = memoList.filter(
+      (memoListItem) => memoListItem.date.indexOf(monthValue) !== -1
+    );
+    SetMemoListChaged(filterMemoList);
   };
 
   useEffect(() => {
@@ -173,11 +204,11 @@ const SignUpPage = () => {
 
         <MemoFilter
           categoryList={categoryList}
-          categoryFilterOn={(categoryFilter) =>
-            categoryFilterOn(categoryFilter)
-          }
-          categoryFilterNon={() => categoryFilterNon()}
-          modalTypeChanged={(type) => modalTypeChanged(type)}
+          categoryFilter={(item) => categoryFilter(item)}
+          filterYearLabel={filterYearLabel}
+          filterYearChanged={(label) => filterYearChanged(label)}
+          filterMonthChanged={(label) => filterMonthChanged(label)}
+          modalTypeChanged={(label) => modalTypeChanged(label)}
           modalType={modalType}
         />
       </div>
