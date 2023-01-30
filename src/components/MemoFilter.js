@@ -12,11 +12,12 @@ import StoneKi from "../assets/images/stone_ki.png";
 
 const MemoFilter = ({
   categoryList,
-  categoryFilterOn,
-  categoryFilterNon,
-  categoryModalOpen,
+  categoryFilter,
   modalTypeChanged,
   modalType,
+  filterYearChanged,
+  filterYearLabel,
+  filterMonthChanged,
 }) => {
   // number === 3 && console.log("&&の2です");
   // number === 3 || console.log("||の3以外です");
@@ -37,7 +38,7 @@ const MemoFilter = ({
                   return (
                     <button
                       style={styles.FindModalCategoryItem}
-                      onClick={() => categoryFilterOn(item.categoryId)}
+                      onClick={() => categoryFilter(item.categoryId)}
                       key={index}
                     >
                       <img src={item.stoneImg} alt="" />
@@ -47,7 +48,7 @@ const MemoFilter = ({
                   return (
                     <button
                       style={styles.FindModalCategoryItembottom}
-                      onClick={() => categoryFilterOn(item.categoryId)}
+                      onClick={() => categoryFilter(item.categoryId)}
                       key={index}
                     >
                       <img src={item.stoneImg} alt="" />
@@ -58,7 +59,7 @@ const MemoFilter = ({
             </div>
             <button
               style={styles.FindModalFilterNonButton}
-              onClick={() => categoryFilterOn("none_category")}
+              onClick={() => categoryFilter("none_filter")}
             >
               指定しない
             </button>
@@ -73,15 +74,33 @@ const MemoFilter = ({
             <div style={styles.FindModalDateList}>
               <label style={styles.FindModalDateItem}>
                 <span style={styles.FindModalDateItemText}>年</span>
-                <select style={styles.FindModalDateItemSelect}>
+                <select
+                  name="filteryear"
+                  style={styles.FindModalDateItemSelect}
+                  onChange={(label) => filterYearChanged(label)}
+                >
                   <option value="-">-</option>
                   <option value="2022">2022</option>
                   <option value="2023">2023</option>
                 </select>
               </label>
-              <label style={styles.FindModalDateItem}>
+              <label
+                name="filtermonth"
+                style={
+                  filterYearLabel !== "-"
+                    ? styles.FindModalDateItem
+                    : styles.FindModalDateItemDisable
+                }
+                onChange={(label) => filterMonthChanged(label)}
+              >
                 <span style={styles.FindModalDateItemText}>月</span>
-                <select style={styles.FindModalDateItemSelect}>
+                <select
+                  style={
+                    filterYearLabel !== "-"
+                      ? styles.FindModalDateItemSelect
+                      : styles.FindModalDateItemSelectDisable
+                  }
+                >
                   <option value="-">-</option>
                   <option value="10">10</option>
                   <option value="11">11</option>
@@ -90,7 +109,7 @@ const MemoFilter = ({
               </label>
             </div>
             <button
-              onClick={() => modalTypeChanged("none")}
+              onClick={() => categoryFilter("none_filter")}
               style={styles.FindModalFilterNonButton}
             >
               指定しない
@@ -242,6 +261,12 @@ const styles = {
     display: "flex",
     alignItems: "center",
   },
+  FindModalDateItemDisable: {
+    width: "46%",
+    display: "flex",
+    alignItems: "center",
+    opacity: "0.4",
+  },
   FindModalDateItemText: {
     color: "rgba(67,67,67,0.5)",
     fontSize: "3.3vw",
@@ -254,5 +279,14 @@ const styles = {
     borderRadius: "1.5vw",
     border: "1px solid rgba(67,67,67,0.5)",
     width: "100%",
+  },
+  FindModalDateItemSelectDisable: {
+    boxSizing: "border-box",
+    padding: "2vw 0",
+    textAlign: "center",
+    borderRadius: "1.5vw",
+    border: "1px solid rgba(67,67,67,0.5)",
+    width: "100%",
+    pointerEvents: "none",
   },
 };
