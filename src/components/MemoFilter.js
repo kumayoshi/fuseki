@@ -1,20 +1,14 @@
 import React from "react";
 
-import StoneShadow from "../assets/images/stone_shadow.svg";
-import ModalArrow from "../assets/images/modal_arw.svg";
-
-import Stone from "../assets/images/stone.png";
-import StoneMomo from "../assets/images/stone_momo.png";
-import StoneAka from "../assets/images/stone_aka.png";
-import StoneAomidori from "../assets/images/stone_aomidori.png";
-import StoneAsagi from "../assets/images/stone_asagi.png";
-import StoneKi from "../assets/images/stone_ki.png";
+import FilterDate from "../components/Filterdate";
 
 const MemoFilter = ({
   categoryList,
-  categoryFilter,
+  filterCategoryImg,
+  filterCategoryChanged,
   modalTypeChanged,
   modalType,
+  filterYearText,
   filterYearChanged,
   filterYearLabel,
   filterMonthChanged,
@@ -25,119 +19,44 @@ const MemoFilter = ({
 
   return (
     // 絞り込みウィンドウ　全体
-    <div style={styles.FindWrap}>
+    <div style={styles.findWrap}>
       {/* 絞り込みモーダル */}
-      <div style={styles.FindModalWrap}>
-        {/* カテゴリー絞り込み */}
-        {modalType === "category" && (
-          <div style={styles.FindModalIn}>
-            <div style={styles.FindModalCategoryList}>
-              {categoryList.map((item, index) => {
-                if (index <= 3) {
-                  // const itemStyle = styles.FindModalCategoryItem;
-                  return (
-                    <button
-                      style={styles.FindModalCategoryItem}
-                      onClick={() => categoryFilter(item.categoryId)}
-                      key={index}
-                    >
-                      <img src={item.stoneImg} alt="" />
-                    </button>
-                  );
-                } else {
-                  return (
-                    <button
-                      style={styles.FindModalCategoryItembottom}
-                      onClick={() => categoryFilter(item.categoryId)}
-                      key={index}
-                    >
-                      <img src={item.stoneImg} alt="" />
-                    </button>
-                  );
-                }
-              })}
-            </div>
-            <button
-              style={styles.FindModalFilterNonButton}
-              onClick={() => categoryFilter("none_filter")}
-            >
-              指定しない
-            </button>
-            <i style={styles.FindModalInArwCategory}>
-              <img src={ModalArrow} alt="" />
-            </i>
-          </div>
-        )}
-        {/* 日付絞り込み */}
-        {modalType === "date" && (
-          <div style={styles.FindModalIn}>
-            <div style={styles.FindModalDateList}>
-              <label style={styles.FindModalDateItem}>
-                <span style={styles.FindModalDateItemText}>年</span>
-                <select
-                  name="filteryear"
-                  style={styles.FindModalDateItemSelect}
-                  onChange={(label) => filterYearChanged(label)}
-                >
-                  <option value="-">-</option>
-                  <option value="2022">2022</option>
-                  <option value="2023">2023</option>
-                </select>
-              </label>
-              <label
-                name="filtermonth"
-                style={
-                  filterYearLabel !== "-"
-                    ? styles.FindModalDateItem
-                    : styles.FindModalDateItemDisable
-                }
-                onChange={(label) => filterMonthChanged(label)}
-              >
-                <span style={styles.FindModalDateItemText}>月</span>
-                <select
-                  style={
-                    filterYearLabel !== "-"
-                      ? styles.FindModalDateItemSelect
-                      : styles.FindModalDateItemSelectDisable
-                  }
-                >
-                  <option value="-">-</option>
-                  <option value="10">10</option>
-                  <option value="11">11</option>
-                  <option value="12">12</option>
-                </select>
-              </label>
-            </div>
-            <button
-              onClick={() => categoryFilter("none_filter")}
-              style={styles.FindModalFilterNonButton}
-            >
-              指定しない
-            </button>
-            <i style={styles.FindModalInArwDate}>
-              <img src={ModalArrow} alt="" />
-            </i>
-          </div>
-        )}
+      <div style={styles.findModalWrap}>
+        <FilterDate
+          categoryList={categoryList}
+          filterCategoryChanged={filterCategoryChanged}
+          modalType={modalType}
+          filterYearChanged={filterYearChanged}
+          filterYearLabel={filterYearLabel}
+          filterMonthChanged={filterMonthChanged}
+        />
       </div>
       {/* 検索ウィンドウ */}
       <div>
-        <div style={styles.FindButtonList}>
+        <div style={styles.findButtonList}>
           <button
-            style={styles.FindButton}
+            style={
+              filterCategoryImg.indexOf("_shadow") !== -1
+                ? styles.findButton
+                : styles.findButtonActive
+            }
             onClick={() => modalTypeChanged("category")}
           >
-            <img style={styles.FindButtonImg} src={StoneShadow} alt="" />
+            <img style={styles.findButtonImg} src={filterCategoryImg} alt="" />
           </button>
           <button
-            style={styles.FindButton}
+            style={
+              !isNaN(filterYearLabel)
+                ? styles.findButtonActive
+                : styles.findButton
+            }
             onClick={() => modalTypeChanged("date")}
           >
-            年/月
+            {filterYearText}
           </button>
         </div>
         <input
-          style={styles.FindText}
+          style={styles.findText}
           type="text"
           placeholder="キーワードで検索"
         />
@@ -149,7 +68,7 @@ const MemoFilter = ({
 export default MemoFilter;
 
 const styles = {
-  FindWrap: {
+  findWrap: {
     position: "fixed",
     bottom: "0",
     left: "0",
@@ -160,12 +79,12 @@ const styles = {
     padding: "4vw 6vw",
     boxShadow: "0px 5px 10px rgba(67,67,67,0.5)",
   },
-  FindButtonList: {
+  findButtonList: {
     display: "flex",
     justifyContent: "space-between",
     marginBottom: "3vw",
   },
-  FindButton: {
+  findButton: {
     width: "48%",
     textAlign: "center",
     background: "#fff",
@@ -174,11 +93,25 @@ const styles = {
     borderRadius: "1.5vw",
     color: "rgba(67,67,67,0.5)",
     fontSize: "3.6vw",
+    border: "3px solid #fff",
+    transition: "all .2s ease-out",
   },
-  FindButtonImg: {
+  findButtonActive: {
+    width: "48%",
+    textAlign: "center",
+    background: "#fff",
+    boxSizing: "border-box",
+    padding: "2vw 0",
+    borderRadius: "1.5vw",
+    color: "rgba(67,67,67,0.5)",
+    fontSize: "3.6vw",
+    transition: "all .2s ease-out",
+    border: "3px solid #5BCBCB",
+  },
+  findButtonImg: {
     width: "20%",
   },
-  FindText: {
+  findText: {
     textAlign: "center",
     boxSizing: "border-box",
     padding: "2vw 0",
@@ -187,7 +120,7 @@ const styles = {
     fontSize: "3.6vw",
     width: "100%",
   },
-  FindModalWrap: {
+  findModalWrap: {
     position: "absolute",
     bottom: "calc(100% + 3vw)",
     left: "8vw",
@@ -196,97 +129,5 @@ const styles = {
     borderRadius: "3vw",
     boxShadow: "0px 1px 4px rgba(67,67,67,0.1)",
     zIndex: "5",
-  },
-  FindModalIn: {
-    position: "relative",
-    top: "0",
-    left: "0",
-    boxSizing: "border-box",
-    padding: "8vw",
-  },
-  FindModalInArwDate: {
-    position: "absolute",
-    bottom: "-6vw",
-    right: "15vw",
-    width: "8vw",
-  },
-  FindModalCategoryList: {
-    display: "flex",
-    flexWrap: "wrap",
-  },
-  FindModalCategoryItem: {
-    width: "21%",
-    marginRight: "4%",
-    position: "relative",
-    top: "0",
-    left: "0",
-    background: "#fff",
-    borderRadius: "1.5vw",
-    border: "1px solid rgba(67,67,67,0.5)",
-  },
-  FindModalCategoryItembottom: {
-    width: "21%",
-    marginRight: "4%",
-    marginTop: "3vw",
-    position: "relative",
-    top: "0",
-    left: "0",
-    background: "#fff",
-    borderRadius: "1.5vw",
-    border: "1px solid rgba(67,67,67,0.5)",
-  },
-  FindModalInArwCategory: {
-    position: "absolute",
-    bottom: "-6vw",
-    left: "15vw",
-    width: "8vw",
-  },
-  FindModalFilterNonButton: {
-    display: "block",
-    margin: "6vw auto 0px",
-    background: "#fff",
-    borderRadius: "1.5vw",
-    border: "1px solid rgba(67,67,67,0.5)",
-    boxSizing: "border-box",
-    padding: "2vw 12vw",
-    textAlign: "center",
-  },
-  FindModalDateList: {
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  FindModalDateItem: {
-    width: "46%",
-    display: "flex",
-    alignItems: "center",
-  },
-  FindModalDateItemDisable: {
-    width: "46%",
-    display: "flex",
-    alignItems: "center",
-    opacity: "0.4",
-  },
-  FindModalDateItemText: {
-    color: "rgba(67,67,67,0.5)",
-    fontSize: "3.3vw",
-    marginRight: "2vw",
-  },
-  FindModalDateItemSelect: {
-    boxSizing: "border-box",
-    padding: "2vw 0",
-    textAlign: "center",
-    borderRadius: "1.5vw",
-    border: "1px solid rgba(67,67,67,0.5)",
-    width: "100%",
-  },
-  FindModalDateItemSelectDisable: {
-    boxSizing: "border-box",
-    padding: "2vw 0",
-    textAlign: "center",
-    borderRadius: "1.5vw",
-    border: "1px solid rgba(67,67,67,0.5)",
-    width: "100%",
-    pointerEvents: "none",
   },
 };
