@@ -7,13 +7,14 @@ import Header from "../components/Header";
 import { Navigate } from "react-router-dom";
 import MemoItem from "../components/MemoItem";
 import MemoFilter from "../components/MemoFilter";
+import stoneShadow from "../assets/images/stone_shadow.svg";
 // 各カテゴエリー石の画像
-import Stone from "../assets/images/stone.png";
-import StoneMomo from "../assets/images/stone_momo.png";
-import StoneAka from "../assets/images/stone_aka.png";
-import StoneAomidori from "../assets/images/stone_aomidori.png";
-import StoneAsagi from "../assets/images/stone_asagi.png";
-import StoneKi from "../assets/images/stone_ki.png";
+import stone from "../assets/images/stone.svg";
+import stoneMomo from "../assets/images/stone_momo.svg";
+import stoneAka from "../assets/images/stone_aka.svg";
+import stoneAomidori from "../assets/images/stone_aomidori.svg";
+import stoneAsagi from "../assets/images/stone_asagi.svg";
+import stoneKi from "../assets/images/stone_ki.svg";
 
 const SignUpPage = () => {
   // メモ一覧の記事データベース
@@ -57,45 +58,43 @@ const SignUpPage = () => {
     },
   ];
 
-  const [memoListChaged, SetMemoListChaged] = useState(memoList);
-
   // 各登録済みカテゴリのデータベース
   const categoryList = [
     {
       categoryId: 1,
       categoryName: "それ素敵",
       categoryItem: 0,
-      stoneImg: StoneMomo,
+      stoneImg: stoneMomo,
     },
     {
       categoryId: 2,
       categoryName: "これから",
       categoryItem: 0,
-      stoneImg: StoneAsagi,
+      stoneImg: stoneAsagi,
     },
     {
       categoryId: 3,
       categoryName: "日々をつぶやく",
       categoryItem: 0,
-      stoneImg: Stone,
+      stoneImg: stone,
     },
     {
       categoryId: 4,
       categoryName: "ふと思う",
       categoryItem: 0,
-      stoneImg: StoneAomidori,
+      stoneImg: stoneAomidori,
     },
     {
       categoryId: 5,
       categoryName: "この瞬間をしたためる",
       categoryItem: 0,
-      stoneImg: StoneKi,
+      stoneImg: stoneKi,
     },
     {
       categoryId: 6,
       categoryName: "どこにも言えないこの気持ち",
       categoryItem: 0,
-      stoneImg: StoneAka,
+      stoneImg: stoneAka,
     },
   ];
 
@@ -138,48 +137,94 @@ const SignUpPage = () => {
     type === modalType ? setModalType("none") : setModalType(type);
   };
 
-  // category絞り込みcategory内 categoryId検索
-  // ---------- categoryId　無い場合はこの関数内でリセットする
-  const categoryFilter = (currentCategoryId) => {
-    if (currentCategoryId !== "none_filter") {
-      const filterMemoList = memoList.filter(
-        (memoListItem) => memoListItem.categoryId === currentCategoryId
+  // filter後の配列　保存用のステート
+  const [memoListChaged, setMemoListChaged] = useState(memoList);
+  // category絞り込み時の石の画像保存用変数
+  const [filterCategoryImg, setFilterCategoryImg] = useState(stoneShadow);
+  // 画像下部の絞り込みバー　日付部分変更保存用変数
+  const [filterYearText, setFilterYearText] = useState("年/月");
+  // 日付絞り込み時の日付保存用変数
+  const [filterYearLabel, setFilterYearLabel] = useState("-");
+  const filterCategoryChanged = (currentCategoryId) => {
+    if (currentCategoryId !== "none") {
+      if (!isNaN(filterYearLabel)) {
+        if (filterCategoryImg.indexOf("_shadow") !== -1) {
+          setMemoListChaged(
+            memoListChaged.filter(
+              (memoListItem) => memoListItem.categoryId === currentCategoryId
+            )
+          );
+        } else if (filterCategoryImg.indexOf("_shadow") === -1) {
+          let memoListChangeSeconds = memoList.filter(
+            (memoListItem) => memoListItem.categoryId === currentCategoryId
+          );
+          memoListChangeSeconds = memoListChangeSeconds.filter(
+            (memoListItem) => memoListItem.date.indexOf(filterYearText) !== -1
+          );
+          setMemoListChaged(memoListChangeSeconds);
+        }
+      } else {
+        setMemoListChaged(
+          memoList.filter(
+            (memoListItem) => memoListItem.categoryId === currentCategoryId
+          )
+        );
+      }
+      const setFilterCategoryCurrentItem = categoryList.find(
+        (categoryItem) => categoryItem.categoryId === currentCategoryId
       );
-      SetMemoListChaged(filterMemoList);
+      setFilterCategoryImg(setFilterCategoryCurrentItem.stoneImg);
     } else {
       modalTypeChanged("none");
-      setFilterYearLabel("-");
-      SetMemoListChaged(memoList);
+      setFilterCategoryImg(stoneShadow);
+      setMemoListChaged(memoList);
     }
   };
   // date絞り込み
-  // -----------年
-  const [filterYearLabel, setFilterYearLabel] = useState("-");
-  const filterYearChanged = (item) => {
-    const yearValue = item.target.value;
-    setFilterYearLabel(yearValue);
+  const filterDateDisable = () => {
+    modalTypeChanged("none");
+    setFilterYearText("年/月");
+    setFilterYearLabel("-");
+    setMemoListChaged(memoList);
+  };
+  // let filterMemoList = [];
+  const filterDateAble = (label) => {
     const filterMemoList = memoList.filter(
-      (memoListItem) => memoListItem.date.indexOf(yearValue) !== -1
+      (memoListItem) => memoListItem.date.indexOf(label) !== -1
     );
-    SetMemoListChaged(filterMemoList);
+    // if (filterCategoryImg.indexOf("_shadow") === -1) {
+    //   filterMemoList = filterMemoList.filter(
+    //     (memoListItem) => memoListItem.categoryId === currentCategoryId
+    //   );
+    // }
+    setFilterYearText(label);
+    setMemoListChaged(filterMemoList);
+  };
+
+  // -----------年
+  const filterYearChanged = (item) => {
+    if (item !== "none") {
+      const yearValue = item.target.value;
+      setFilterYearLabel(yearValue);
+      filterDateAble(yearValue);
+    } else {
+      filterDateDisable();
+    }
   };
 
   // -----------月
   const filterMonthChanged = (item) => {
-    const monthValue = filterYearLabel + "/" + item.target.value;
-    const filterMemoList = memoList.filter(
-      (memoListItem) => memoListItem.date.indexOf(monthValue) !== -1
-    );
-    SetMemoListChaged(filterMemoList);
+    if (item !== "none") {
+      const monthValue = filterYearLabel + "/" + item.target.value;
+      filterDateAble(monthValue);
+    } else {
+      filterDateDisable();
+    }
   };
 
   useEffect(() => {
     return;
   }, [memoListChaged]);
-
-  // const CategoryFilterChange = useEffect(() => {
-  //   console.log();
-  // },[categoryFilter]);
 
   return (
     <div className={CommonStyles.wrap}>
@@ -204,7 +249,9 @@ const SignUpPage = () => {
 
         <MemoFilter
           categoryList={categoryList}
-          categoryFilter={(item) => categoryFilter(item)}
+          filterCategoryImg={filterCategoryImg}
+          filterCategoryChanged={(item) => filterCategoryChanged(item)}
+          filterYearText={filterYearText}
           filterYearLabel={filterYearLabel}
           filterYearChanged={(label) => filterYearChanged(label)}
           filterMonthChanged={(label) => filterMonthChanged(label)}

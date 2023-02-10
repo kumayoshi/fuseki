@@ -41,10 +41,10 @@ const styles = {
     color: "#434343",
   },
   CategoryStone: {
-    minWidth: "12vw",
-    width: "12vw",
+    minWidth: "8vw",
+    width: "8vw",
     marginRight: "3%",
-    padding: "1.5vw",
+    padding: "0vw 1.5vw 2.5vw 1.5vw",
     boxSizing: "border-box",
   },
   CategoryText: {
