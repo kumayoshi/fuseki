@@ -102,7 +102,7 @@ const ArticlePage = () => {
   ];
 
   // 読み込み時id参照
-  let params = useParams();
+  const params = useParams();
   const itemId = parseInt(params.id, 10);
   const item = memoList.find((memoItem) => memoItem.itemId === itemId);
   const [itemTitle, setItemTitle] = useState(item.title);

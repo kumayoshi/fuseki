@@ -31,15 +31,16 @@ const ArticleCategory = ({ itemCategory, onChange, categoryList }) => {
         onChange={(item) => onChange(item)}
         style={flug ? styles.input : styles.non}
       >
-        {categoryList.map((categoryItem, index) => {
+        {categoryList.map((categoryItem) => {
           const categoryItemId = categoryItem.categoryId;
-          return (
-            <option value={categoryItemId} key={index}>
+          return categoryItemId === itemCategory ? (
+            <option value={categoryItemId} key={categoryItemId} selected>
               {categoryItem.categoryName}
             </option>
-            // <option value={categoryItemId} key={index} {categoryItemId === itemCategory && "selected"} >
-            //   {categoryItem.categoryName}
-            // </option>
+          ) : (
+            <option value={categoryItemId} key={categoryItemId}>
+              {categoryItem.categoryName}
+            </option>
           );
         })}
       </select>
