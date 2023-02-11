@@ -1,9 +1,10 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
-const MemoItem = ({ memoText, stone, categoryText, memoDate }) => {
+const MemoItem = ({ memoText, stone, categoryText, memoDate, articleId }) => {
   return (
     <li style={styles.ItemWrap}>
-      <a style={styles.ItemWrapIn} href={"/article/"}>
+      <Link style={styles.ItemWrapIn} to={"/article/" + articleId}>
         <p style={styles.ItemTitleWrap}>
           <i style={styles.CategoryStone}>
             <img src={stone} alt="" />
@@ -12,7 +13,7 @@ const MemoItem = ({ memoText, stone, categoryText, memoDate }) => {
         </p>
         <p style={styles.CategoryText}>{categoryText}</p>
         <p style={styles.DateText}>{memoDate}</p>
-      </a>
+      </Link>
     </li>
   );
 };

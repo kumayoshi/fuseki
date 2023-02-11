@@ -238,6 +238,7 @@ const SignUpPage = () => {
                 memoText={item.title}
                 stone={itemCategory.stoneImg}
                 categoryText={itemCategory.categoryName}
+                articleId={item.itemId}
                 memoDate={item.date}
                 key={index}
               />

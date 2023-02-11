@@ -14,7 +14,7 @@ function App() {
         <Route path={"/signup/"} element={<SignUpPage></SignUpPage>} />
         <Route path={"/memolist/"} element={<MemoListPage></MemoListPage>} />
         <Route path={"/auth/"} element={<AuthPage></AuthPage>} />
-        <Route path={"/article/"} element={<ArticlePage></ArticlePage>} />
+        <Route path={"/article/:id"} element={<ArticlePage></ArticlePage>} />
         <Route path={"/onbord/"} element={<OnBord></OnBord>} />
       </Routes>
     </BrowserRouter>
