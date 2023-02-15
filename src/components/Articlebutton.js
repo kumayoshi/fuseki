@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 
 const Articlebutton = ({ text, styleName, onClick }) => {
-  console.log(styleName);
   return (
     <button style={styleName} onClick={(e) => onClick(e)}>
       {text}

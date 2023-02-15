@@ -8,9 +8,12 @@ import ArticleText from "../components/ArticleText";
 import ArticleTrigger from "../components/ArticleTrigger";
 import ArticleCategory from "../components/ArticleCategory";
 import Articlebutton from "../components/Articlebutton";
+import ArticleDeleteComfirm from "../components/ArticleDeleteComfirm";
 
 // import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { Navigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+
+import backArrow from "../assets/images/backArrow.svg";
 
 import stone from "../assets/images/stone.svg";
 import stoneMomo from "../assets/images/stone_momo.svg";
@@ -103,25 +106,39 @@ const ArticlePage = () => {
 
   // 読み込み時id参照
   const params = useParams();
-  const itemId = parseInt(params.id, 10);
-  const item = memoList.find((memoItem) => memoItem.itemId === itemId);
-  const [itemTitle, setItemTitle] = useState(item.title);
-  const [itemText, setItemText] = useState(item.text);
-  const [itemTrigger, setItemTrigger] = useState(item.trigger);
-  const [itemCategory, setItemCategory] = useState(item.categoryId);
+  let itemId = "";
+  let item = "";
+  const [itemTitle, setItemTitle] = useState("");
+  const [itemText, setItemText] = useState("");
+  const [itemTrigger, setItemTrigger] = useState("");
+  const [itemCategory, setItemCategory] = useState("");
+  useEffect(() => {
+    if (params.id !== "new") {
+      itemId = parseInt(params.id, 10);
+      item = memoList.find((memoItem) => memoItem.itemId === itemId);
+      setItemTitle(item.title);
+      setItemText(item.text);
+      setItemTrigger(item.trigger);
+      setItemCategory(item.categoryId);
+    }
+  }, []);
   const itemCategoryChanged = (item) => {
     setItemCategory(item.target.value);
   };
-  useEffect(() => {
-    console.log("itemTitle : ", itemTitle);
-    console.log("itemText : ", itemText);
-    console.log("itemTrigger : ", itemTrigger);
-    console.log("itemCategory : ", itemCategory);
-  }, [itemTitle, itemText, itemTrigger, itemCategory]);
 
-  const buttonSave = () => {};
-
-  const buttonDelete = () => {};
+  const [itemDeleteModal, setItemDeleteModal] = useState(false);
+  const buttonSave = () => {
+    console.log("保存しました");
+  };
+  const buttonDeleteComfirm = () => {
+    itemDeleteModal ? setItemDeleteModal(false) : setItemDeleteModal(true);
+  };
+  const buttonDeleteComfirmCancel = () => {
+    setItemDeleteModal(false);
+  };
+  const buttonDelete = () => {
+    console.log("削除しました");
+  };
 
   return (
     <div className={CommonStyles.wrap}>
@@ -153,10 +170,19 @@ const ArticlePage = () => {
           <Articlebutton
             text="削除"
             styleName={styles.delete}
-            onClick={() => buttonDelete()}
+            onClick={() => buttonDeleteComfirm()}
           />
         </div>
-        <a href={"/memolist/"}>メモ一覧ページへ</a>
+        <div style={styles.backArrow}>
+          <a style={styles.backArrowLink} href={"/memolist/"}>
+            <img src={backArrow} alt="" />
+          </a>
+        </div>
+        <ArticleDeleteComfirm
+          itemDeleteModal={itemDeleteModal}
+          buttonDeleteComfirmCancel={() => buttonDeleteComfirmCancel()}
+          buttonDelete={() => buttonDelete()}
+        />
       </div>
     </div>
   );
@@ -186,12 +212,12 @@ const styles = {
     width: "49vw",
     margin: "11vw auto 0px",
     display: "block",
-    padding: "3vw 0",
+    padding: "2vw 0",
     boxSizing: "border-box",
     textAlign: "center",
     fontSize: "4vw",
     fontWeight: "bold",
-    border: "2px solid #5bcbcb",
+    border: "1vw solid #5bcbcb",
     color: "#fff",
     borderRadius: "8px",
     background: "#5bcbcb",
@@ -200,28 +226,31 @@ const styles = {
     width: "49vw",
     margin: "6vw auto 0px",
     display: "block",
-    padding: "3vw 0",
+    padding: "2vw 0",
     boxSizing: "border-box",
     textAlign: "center",
     fontSize: "4vw",
     fontWeight: "bold",
-    border: "2px solid #F27855",
+    border: "1vw solid #F27855",
     color: "#F27855",
     borderRadius: "8px",
     background: "#fff",
   },
-  deleteIn: {
-    width: "49vw",
-    margin: "11vw auto 0px",
+  backArrow: {
+    position: "fixed",
+    left: "0",
+    bottom: "20vw",
+    width: "16vw",
+    height: "16vw",
+    backgroundColor: "#fff",
+    borderRadius: "0 8px 8px 0",
+    boxShadow: "rgb(0 0 0 / 16%) 0px 3px 5px",
+  },
+  backArrowLink: {
     display: "block",
-    padding: "3vw 0",
+    width: "100%",
+    height: "100%",
     boxSizing: "border-box",
-    textAlign: "center",
-    fontSize: "4vw",
-    fontWeight: "bold",
-    border: "2px solid #F27855",
-    color: "#F27855",
-    borderRadius: "8px",
-    background: "#5bcbcb",
+    padding: "3vw",
   },
 };

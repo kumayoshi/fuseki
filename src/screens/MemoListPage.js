@@ -8,6 +8,7 @@ import { Navigate } from "react-router-dom";
 import MemoItem from "../components/MemoItem";
 import MemoFilter from "../components/MemoFilter";
 import stoneShadow from "../assets/images/stone_shadow.svg";
+import newArticle from "../assets/images/newMemo.svg";
 // 各カテゴエリー石の画像
 import stone from "../assets/images/stone.svg";
 import stoneMomo from "../assets/images/stone_momo.svg";
@@ -245,9 +246,12 @@ const SignUpPage = () => {
             );
           })}
         </ul>
-        <a href={"/article/"}>新規メモ作成ページに</a>
         <a href={"/auth/"}>アカウント設定ページへ</a>
-
+        <div style={styles.newArticle}>
+          <a style={styles.newArticleLink} href={"/article/new"}>
+            <img src={newArticle} alt="" />
+          </a>
+        </div>
         <MemoFilter
           categoryList={categoryList}
           filterCategoryImg={filterCategoryImg}
@@ -280,5 +284,20 @@ const styles = {
     margin: "25vw auto 0",
     width: "79%",
     borderRadius: "10px",
+  },
+  newArticle: {
+    position: "fixed",
+    right: "0",
+    bottom: "40vw",
+    width: "16vw",
+    height: "16vw",
+    backgroundColor: "#fff",
+    borderRadius: "8px 0 0 8px",
+    boxShadow: "rgb(0 0 0 / 16%) 0px 3px 5px",
+  },
+  newArticleLink: {
+    display: "block",
+    width: "100%",
+    height: "100%",
   },
 };
