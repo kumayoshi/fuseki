@@ -7,24 +7,24 @@ import Header from "../components/Header";
 // import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { Navigate } from "react-router-dom";
 
-import Stone from "../assets/images/stone.png";
-import StoneMomo from "../assets/images/stone_momo.png";
-import StoneAka from "../assets/images/stone_aka.png";
-import StoneAkacha from "../assets/images/stone_akacha.png";
-import StoneAkaki from "../assets/images/stone_akaki.png";
-import StoneAo from "../assets/images/stone_ao.png";
-import StoneAomidori from "../assets/images/stone_aomidori.png";
-import StoneAsagi from "../assets/images/stone_asagi.png";
-import StoneCha from "../assets/images/stone_cha.png";
-import StoneKi from "../assets/images/stone_ki.png";
-import StoneKimidori from "../assets/images/stone_kimidori.png";
-import StoneKoke from "../assets/images/stone_koke.png";
-import StoneOrange from "../assets/images/stone_orange.png";
-import StoneOre from "../assets/images/stone_ore.png";
-import StonePurple from "../assets/images/stone_purple.png";
-import StoneSinku from "../assets/images/stone_sinku.png";
-import StoneUsuki from "../assets/images/stone_usuki.png";
-import StoneUsumomo from "../assets/images/stone_usumomo.png";
+import stone from "../assets/images/stone.svg";
+import stoneMomo from "../assets/images/stone_momo.svg";
+import stoneAka from "../assets/images/stone_aka.svg";
+import stoneAkacha from "../assets/images/stone_akacha.svg";
+import stoneAkaki from "../assets/images/stone_akaki.svg";
+import stoneAo from "../assets/images/stone_ao.svg";
+import stoneAomidori from "../assets/images/stone_aomidori.svg";
+import stoneAsagi from "../assets/images/stone_asagi.svg";
+import stoneCha from "../assets/images/stone_cha.svg";
+import stoneKi from "../assets/images/stone_ki.svg";
+import stoneKimidori from "../assets/images/stone_kimidori.svg";
+import stoneKoke from "../assets/images/stone_koke.svg";
+import stoneOrange from "../assets/images/stone_orange.svg";
+import stoneOre from "../assets/images/stone_ore.svg";
+import stonePurple from "../assets/images/stone_purple.svg";
+import stoneSinku from "../assets/images/stone_sinku.svg";
+import stoneUsuki from "../assets/images/stone_usuki.svg";
+import stoneUsumomo from "../assets/images/stone_usumomo.svg";
 
 const AuthPage = () => {
   const [iconActive, setIconActive] = useState(false);
@@ -34,37 +34,37 @@ const AuthPage = () => {
       categoryId: 1,
       categoryName: "それ素敵",
       categoryItem: 0,
-      stoneImg: StoneMomo,
+      stoneImg: stoneMomo,
     },
     {
       categoryId: 2,
       categoryName: "これから",
       categoryItem: 0,
-      stoneImg: StoneAsagi,
+      stoneImg: stoneAsagi,
     },
     {
       categoryId: 3,
       categoryName: "日々をつぶやく",
       categoryItem: 0,
-      stoneImg: Stone,
+      stoneImg: stone,
     },
     {
       categoryId: 4,
       categoryName: "ふと思う",
       categoryItem: 0,
-      stoneImg: StoneAomidori,
+      stoneImg: stoneAomidori,
     },
     {
       categoryId: 5,
       categoryName: "この瞬間をしたためる",
       categoryItem: 0,
-      stoneImg: StoneKi,
+      stoneImg: stoneKi,
     },
     {
       categoryId: 6,
       categoryName: "どこにも言えないこの気持ち",
       categoryItem: 0,
-      stoneImg: StoneAka,
+      stoneImg: stoneAka,
     },
   ];
 
