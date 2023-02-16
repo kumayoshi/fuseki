@@ -132,53 +132,54 @@ const SignUpPage = () => {
     );
   };
 
-  //
+  // 絞り込みモーダルのタイプ
   const [modalType, setModalType] = useState("none"); // none , date , category
   const modalTypeChanged = (type) => {
     type === modalType ? setModalType("none") : setModalType(type);
+  };
+  // 絞り込みモーダルの閉じるボタンを押した際の動き
+  const filterClose = () => {
+    setModalType("none");
   };
 
   // filter後の配列　保存用のステート
   const [memoListChaged, setMemoListChaged] = useState(memoList);
   // category絞り込み時の石の画像保存用変数
   const [filterCategoryImg, setFilterCategoryImg] = useState(stoneShadow);
+  // category絞り込み時のID
+  const [filterCategoryId, setFilterCategoryId] = useState(stoneShadow);
   // 画像下部の絞り込みバー　日付部分変更保存用変数
   const [filterYearText, setFilterYearText] = useState("年/月");
   // 日付絞り込み時の日付保存用変数
   const [filterYearLabel, setFilterYearLabel] = useState("-");
+
+  // カテゴリを選択した際
   const filterCategoryChanged = (currentCategoryId) => {
     if (currentCategoryId !== "none") {
+      let memoListChangeSeconds = memoList.filter(
+        (memoListItem) => memoListItem.categoryId === currentCategoryId
+      );
+      // -----日付がすでに絞り込まれていた場合
       if (!isNaN(filterYearLabel)) {
-        if (filterCategoryImg.indexOf("_shadow") !== -1) {
-          setMemoListChaged(
-            memoListChaged.filter(
-              (memoListItem) => memoListItem.categoryId === currentCategoryId
-            )
-          );
-        } else if (filterCategoryImg.indexOf("_shadow") === -1) {
-          let memoListChangeSeconds = memoList.filter(
-            (memoListItem) => memoListItem.categoryId === currentCategoryId
-          );
-          memoListChangeSeconds = memoListChangeSeconds.filter(
-            (memoListItem) => memoListItem.date.indexOf(filterYearText) !== -1
-          );
-          setMemoListChaged(memoListChangeSeconds);
-        }
-      } else {
-        setMemoListChaged(
-          memoList.filter(
-            (memoListItem) => memoListItem.categoryId === currentCategoryId
-          )
+        memoListChangeSeconds = memoListChangeSeconds.filter(
+          (memoListItem) => memoListItem.date.indexOf(filterYearText) !== -1
         );
+        setMemoListChaged(memoListChangeSeconds);
       }
+      setMemoListChaged(memoListChangeSeconds);
+
+      // -----画面下部の絞り込みウィンドウのカテゴリー画像の変更
       const setFilterCategoryCurrentItem = categoryList.find(
         (categoryItem) => categoryItem.categoryId === currentCategoryId
       );
       setFilterCategoryImg(setFilterCategoryCurrentItem.stoneImg);
+      setFilterCategoryId(setFilterCategoryCurrentItem.categoryId);
     } else {
+      // -----カテゴリ　　「指定しない」　を選択した場合
       modalTypeChanged("none");
       setFilterCategoryImg(stoneShadow);
       setMemoListChaged(memoList);
+      setFilterCategoryId("");
     }
   };
   // date絞り込み
@@ -187,22 +188,25 @@ const SignUpPage = () => {
     setFilterYearText("年/月");
     setFilterYearLabel("-");
     setMemoListChaged(memoList);
+    setFilterCategoryId("");
   };
-  // let filterMemoList = [];
+
+  // 年、月で絞り込み関数
   const filterDateAble = (label) => {
-    const filterMemoList = memoList.filter(
+    let filterMemoList = memoList.filter(
       (memoListItem) => memoListItem.date.indexOf(label) !== -1
     );
-    // if (filterCategoryImg.indexOf("_shadow") === -1) {
-    //   filterMemoList = filterMemoList.filter(
-    //     (memoListItem) => memoListItem.categoryId === currentCategoryId
-    //   );
-    // }
+    // カテゴリがすでに絞り込まれている場合カテゴリidで絞り込む
+    if (!isNaN(filterCategoryId)) {
+      filterMemoList = filterMemoList.filter(
+        (memoListItem) => memoListItem.categoryId === filterCategoryId
+      );
+    }
     setFilterYearText(label);
     setMemoListChaged(filterMemoList);
   };
 
-  // -----------年
+  // -----年を選択した際
   const filterYearChanged = (item) => {
     if (item !== "none") {
       const yearValue = item.target.value;
@@ -213,7 +217,7 @@ const SignUpPage = () => {
     }
   };
 
-  // -----------月
+  // -----月を選択した際
   const filterMonthChanged = (item) => {
     if (item !== "none") {
       const monthValue = filterYearLabel + "/" + item.target.value;
@@ -223,6 +227,7 @@ const SignUpPage = () => {
     }
   };
 
+  // memoListChagedが変更された場合描画し直す
   useEffect(() => {
     return;
   }, [memoListChaged]);
@@ -261,6 +266,7 @@ const SignUpPage = () => {
           filterMonthChanged={(label) => filterMonthChanged(label)}
           modalTypeChanged={(label) => modalTypeChanged(label)}
           modalType={modalType}
+          filterClose={() => filterClose()}
         />
       </div>
     </div>

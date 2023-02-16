@@ -12,6 +12,7 @@ const MemoFilter = ({
   filterYearChanged,
   filterYearLabel,
   filterMonthChanged,
+  filterClose,
 }) => {
   // number === 3 && console.log("&&の2です");
   // number === 3 || console.log("||の3以外です");
@@ -29,6 +30,7 @@ const MemoFilter = ({
           filterYearChanged={filterYearChanged}
           filterYearLabel={filterYearLabel}
           filterMonthChanged={filterMonthChanged}
+          filterClose={filterClose}
         />
       </div>
       {/* 検索ウィンドウ */}

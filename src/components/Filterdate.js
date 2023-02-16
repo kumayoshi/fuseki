@@ -1,7 +1,8 @@
 import React from "react";
 import FilterDisable from "./FilterDisable";
 
-import ModalArrow from "../assets/images/modal_arw.svg";
+import modalArrow from "../assets/images/modal_arw.svg";
+import modalClose from "../assets/images/modal_close.svg";
 
 const FilterDate = ({
   categoryList,
@@ -10,10 +11,14 @@ const FilterDate = ({
   filterYearChanged,
   filterYearLabel,
   filterMonthChanged,
+  filterClose,
 }) => {
   if (modalType === "category") {
     return (
       <div style={styles.findModalIn}>
+        <i style={styles.modalClose} onClick={() => filterClose()}>
+          <img src={modalClose} alt="" />
+        </i>
         <div style={styles.findModalCategoryList}>
           {categoryList.map((item, index) => {
             if (index <= 3) {
@@ -44,13 +49,16 @@ const FilterDate = ({
           label={"category"}
         />
         <i style={styles.findModalInArwCategory}>
-          <img src={ModalArrow} alt="" />
+          <img src={modalArrow} alt="" />
         </i>
       </div>
     );
   } else if (modalType === "date") {
     return (
       <div style={styles.findModalIn}>
+        <i style={styles.modalClose} onClick={() => filterClose()}>
+          <img src={modalClose} alt="" />
+        </i>
         <div style={styles.findModalDateList}>
           <label style={styles.findModalDateItem}>
             <span style={styles.findModalDateItemText}>年</span>
@@ -90,7 +98,7 @@ const FilterDate = ({
         </div>
         <FilterDisable filterYearChanged={filterYearChanged} label={"date"} />
         <i style={styles.findModalInArwDate}>
-          <img src={ModalArrow} alt="" />
+          <img src={modalArrow} alt="" />
         </i>
       </div>
     );
@@ -105,7 +113,15 @@ const styles = {
     top: "0",
     left: "0",
     boxSizing: "border-box",
-    padding: "8vw",
+    padding: "12vw 8vw 8vw 8vw",
+  },
+  modalClose: {
+    position: "absolute",
+    top: "6%",
+    right: "5%",
+    width: "5vw",
+    height: "5vw",
+    display: "block",
   },
   findModalInArwDate: {
     position: "absolute",
