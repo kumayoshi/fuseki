@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./CommonStyles.css";
 import CommonStyles from "./CommonStyles.css";
-// import { auth } from "../firebase";
 import Header from "../components/Header";
-// import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import { Navigate } from "react-router-dom";
 import MemoItem from "../components/MemoItem";
 import MemoFilter from "../components/MemoFilter";
@@ -232,9 +232,16 @@ const SignUpPage = () => {
     return;
   }, [memoListChaged]);
 
+  const [user, setUser] = useState("");
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+  }, []);
+
   return (
     <div className={CommonStyles.wrap}>
-      <Header currentPage="メモ一覧" user="" />
+      <Header currentPage="メモ一覧" user={user} />
       <div style={styles.wrap}>
         <ul>
           {memoListChaged.map((item, index) => {

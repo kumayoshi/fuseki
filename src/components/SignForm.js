@@ -1,6 +1,6 @@
 import React from "react";
 
-const SignButton = ({ mailValue, onMailChange, passValue, onPassChange }) => {
+const SignForm = ({ mailValue, onMailChange, passValue, onPassChange }) => {
   return (
     <div>
       <div>
@@ -9,7 +9,7 @@ const SignButton = ({ mailValue, onMailChange, passValue, onPassChange }) => {
           <input
             type="email"
             placeholder="メールアドレス"
-            value={mailValue}
+            // value={mailValue}
             onChange={(e) => onMailChange(e.target.value)}
             style={styles.inputText}
           />
@@ -22,7 +22,7 @@ const SignButton = ({ mailValue, onMailChange, passValue, onPassChange }) => {
           <input
             type="password"
             placeholder="パスワード (6文字以上)"
-            value={passValue}
+            // value={passValue}
             onChange={(e) => onPassChange(e.target.value)}
             style={styles.inputText}
           />
@@ -39,7 +39,7 @@ const SignButton = ({ mailValue, onMailChange, passValue, onPassChange }) => {
   );
 };
 
-export default SignButton;
+export default SignForm;
 
 const styles = {
   labelText: {

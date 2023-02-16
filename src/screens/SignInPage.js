@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
-import "./CommonStyles.css";
-import CommonStyles from "./CommonStyles.css";
-
-import { auth } from "../firebase";
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { Navigate } from "react-router-dom";
-
 import Header from "../components/Header";
 import SignButton from "../components/SignButton";
 import SignForm from "../components/SignForm";
+// firebase
+import { auth } from "../firebase";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+// routerdom
+import { Navigate } from "react-router-dom";
+// style
+import "./CommonStyles.css";
+import CommonStyles from "./CommonStyles.css";
 
 const SignInPage = () => {
   const [mail, setMail] = useState("");
@@ -17,7 +18,6 @@ const SignInPage = () => {
   // SignIn用の関数
   const signInSubmit = async (e) => {
     e.preventDefault();
-    console.log(e);
     const signUpMail = mail;
     const signUpPass = pass;
     await signInWithEmailAndPassword(auth, signUpMail, signUpPass)
@@ -26,7 +26,7 @@ const SignInPage = () => {
         alert("正しく入力してください");
       });
   };
-
+  // ログイン監視
   const [user, setUser] = useState("");
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => {
@@ -45,18 +45,18 @@ const SignInPage = () => {
   } else {
     return (
       <div className={CommonStyles.wrap}>
-        <Header currentPage="ログイン" user="" />
+        <Header currentPage="ログイン" user={user} />
         <div style={styles.wrap}>
           <div>
             <SignForm
-              mailValue={mail}
-              onMailChange={(e) => setMail(e.target.value)}
-              passValue={pass}
-              onPassChange={(e) => setPass(e.target.value)}
+              // mailValue={mail}
+              onMailChange={(text) => setMail(text)}
+              // passValue={pass}
+              onPassChange={(text) => setPass(text)}
             />
 
             <SignButton
-              onClick={() => signInSubmit()}
+              onClick={(e) => signInSubmit(e)}
               label="ログイン"
               style={styles.submitButton}
             />

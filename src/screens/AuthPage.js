@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import "./CommonStyles.css";
 import "./CategoryListStyle.css";
 import CommonStyles from "./CommonStyles.css";
-// import { auth } from "../firebase";
+import { auth } from "../firebase";
 import Header from "../components/Header";
-// import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { Navigate } from "react-router-dom";
+import { signOut, onAuthStateChanged } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 import stone from "../assets/images/stone.svg";
 import stoneMomo from "../assets/images/stone_momo.svg";
@@ -87,10 +87,23 @@ const AuthPage = () => {
   //   StoneUsuki,
   //   StoneUsumomo,
   // ];
+  // ログイン監視
+  const [user, setUser] = useState("");
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+  }, []);
+  // ログアウト
+  const navigate = useNavigate();
+  const LogOut = async () => {
+    await signOut(auth);
+    navigate("/");
+  };
 
   return (
     <div className={CommonStyles.wrap}>
-      <Header currentPage="アカウントの設定" user="" />
+      <Header currentPage="アカウントの設定" user={user} />
       <div style={styles.wrap}>
         <div>
           <div>
@@ -152,6 +165,8 @@ const AuthPage = () => {
               ))}
             </ul>
           </div> */}
+
+          <button onClick={() => LogOut()}>ログアウト</button>
         </div>
       </div>
     </div>

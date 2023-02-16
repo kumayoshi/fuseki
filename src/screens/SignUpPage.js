@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "./CommonStyles.css";
 import CommonStyles from "./CommonStyles.css";
-// import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import Header from "../components/Header";
-// import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { Navigate } from "react-router-dom";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+} from "firebase/auth";
+import { collection, addDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 import SignButton from "../components/SignButton";
 import SignForm from "../components/SignForm";
@@ -12,25 +16,58 @@ import SignForm from "../components/SignForm";
 const SignUpPage = () => {
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
-
+  const navigate = useNavigate();
   // SignUp用の関数
-  const signInSubmit = () => {
-    console.log("SignIn用の関数です。");
+  const signInSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const signUpMail = mail;
+      const signUpPass = pass;
+      await createUserWithEmailAndPassword(auth, signUpMail, signUpPass);
+      setMail("");
+      setPass("");
+
+      onAuthStateChanged(auth, (currentUser) => {
+        addDoc(collection(db, "userList"), {
+          mailadress: signUpMail,
+          password: signUpPass,
+          signInUserId: currentUser?.uid,
+        });
+      });
+
+      navigate("/onbord/");
+    } catch (error) {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(
+        "errorCode:" + errorCode,
+        "     errorMessage:" + errorMessage
+      );
+      alert("正しく入力してください");
+    }
   };
+  // ログイン監視
+  const [user, setUser] = useState("");
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+  }, []);
 
   return (
     <div className={CommonStyles.wrap}>
-      <Header currentPage="新規登録" user="" />
+      <Header currentPage="新規登録" user={user} />
       <div style={styles.wrap}>
         <SignForm
           mailValue={mail}
-          onMailChange={(e) => setMail(e.target.value)}
+          onMailChange={(text) => setMail(text)}
           passValue={pass}
-          onPassChange={(e) => setPass(e.target.value)}
+          onPassChange={(text) => setPass(text)}
         />
 
         <SignButton
-          onClick={() => signInSubmit()}
+          onClick={(e) => signInSubmit(e)}
           label="新規登録"
           style={styles.submitButton}
         />
