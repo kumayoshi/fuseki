@@ -246,7 +246,6 @@ const SignUpPage = () => {
             );
           })}
         </ul>
-        <a href={"/auth/"}>アカウント設定ページへ</a>
         <div style={styles.newArticle}>
           <a style={styles.newArticleLink} href={"/article/new"}>
             <img src={newArticle} alt="" />
