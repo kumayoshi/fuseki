@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
+// import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+// import { getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
@@ -10,9 +11,11 @@ const firebaseConfig = {
   storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGE_SENDER_ID,
   appId: process.env.REACT_APP_FIREBASE_SENDER_ID,
+  // measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
+// const analytics = getAnalytics(firebaseApp);
 export const db = getFirestore(firebaseApp);
-export const storage = getStorage();
+// export const storage = getStorage();
 export const auth = getAuth();
