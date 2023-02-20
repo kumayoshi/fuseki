@@ -2,9 +2,18 @@ import React, { useState, useEffect } from "react";
 import "./CommonStyles.css";
 import CommonStyles from "./CommonStyles.css";
 import Header from "../components/Header";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
+import {
+  doc,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  deleteDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import { Navigate } from "react-router-dom";
 import MemoItem from "../components/MemoItem";
 import MemoFilter from "../components/MemoFilter";
 import stoneShadow from "../assets/images/stone_shadow.svg";
@@ -24,7 +33,7 @@ const SignUpPage = () => {
       userId: 1,
       itemId: 1,
       title: "ここで働くということ",
-      text: "ここには本文がたくさん入ります。\nデータに入れる際の改行とかどうするんだろう。",
+      text: "ここには本文がたくさん入ります。データに入れる際の改行とかどうするんだろう。",
       trigger: "ここにはメモをしようと思ったきっかけが入ります。",
       date: "2022/10/10 10:00",
       categoryId: 1,
@@ -37,6 +46,35 @@ const SignUpPage = () => {
       trigger: "超相対性理論を聞いてのメモ",
       date: "2023/10/27 10:00",
       categoryId: 5,
+    },
+    {
+      userId: 1,
+      itemId: 3,
+      title: "遊びとは自由であることだ",
+      text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
+      trigger: "超相対性理論を聞いてのメモ",
+      date: "2023/11/27 10:00",
+      categoryId: 3,
+    },
+    {
+      userId: 1,
+      itemId: 3,
+      title:
+        "仕事を楽しんでやっているという人は自由に生きるリテラシーを持っているるるるるるるるる",
+      text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
+      trigger: "超相対性理論を聞いてのメモ",
+      date: "2023/12/27 10:00",
+      categoryId: 4,
+    },
+    {
+      userId: 1,
+      itemId: 3,
+      title:
+        "仕事を楽しんでやっているという人は自由に生きるリテラシーを持っている仕事を楽しんでやっているという人は自由に生きるリテラシーを持っている仕事を楽しんでやっているという人は自由に生きるリテラシーを持っている仕事を楽しんでやっているという人は自由に生きるリテラシーを持っている",
+      text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
+      trigger: "超相対性理論を聞いてのメモ",
+      date: "2023/12/27 10:00",
+      categoryId: 4,
     },
     {
       userId: 1,
@@ -64,37 +102,31 @@ const SignUpPage = () => {
     {
       categoryId: 1,
       categoryName: "それ素敵",
-      categoryItem: 0,
       stoneImg: stoneMomo,
     },
     {
       categoryId: 2,
       categoryName: "これから",
-      categoryItem: 0,
       stoneImg: stoneAsagi,
     },
     {
       categoryId: 3,
       categoryName: "日々をつぶやく",
-      categoryItem: 0,
       stoneImg: stone,
     },
     {
       categoryId: 4,
       categoryName: "ふと思う",
-      categoryItem: 0,
       stoneImg: stoneAomidori,
     },
     {
       categoryId: 5,
       categoryName: "この瞬間をしたためる",
-      categoryItem: 0,
       stoneImg: stoneKi,
     },
     {
       categoryId: 6,
       categoryName: "どこにも言えないこの気持ち",
-      categoryItem: 0,
       stoneImg: stoneAka,
     },
   ];
@@ -111,7 +143,14 @@ const SignUpPage = () => {
           [1, 2],
         ],
       },
-      categoryList: [1, 5],
+      categoryList: [
+        {
+          categoryId: "QEZ9W6oa85dxe1U5xfxm",
+          categoryTotalCount: 20,
+          lastyearcategoryTotalCount: 18,
+        },
+      ],
+      memoTotalCount: 20,
     },
     {
       userId: 2,
@@ -122,6 +161,7 @@ const SignUpPage = () => {
         month: [[12], [1]],
       },
       categoryList: [2, 3],
+      memoTotalCount: 20,
     },
   ];
 

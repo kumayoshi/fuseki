@@ -29,7 +29,7 @@ const ArticlePage = () => {
       userId: 1,
       itemId: 1,
       title: "ここで働くということ",
-      text: "ここには本文がたくさん入ります。\nデータに入れる際の改行とかどうするんだろう。",
+      text: "ここには本文がたくさん入ります。データに入れる際の改行とかどうするんだろう。",
       trigger: "ここにはメモをしようと思ったきっかけが入ります。",
       date: "2022/10/10 10:00",
       categoryId: 1,
@@ -125,6 +125,8 @@ const ArticlePage = () => {
   const itemCategoryChanged = (item) => {
     setItemCategory(item.target.value);
   };
+
+  console.log(itemText);
 
   const [itemDeleteModal, setItemDeleteModal] = useState(false);
   const buttonSave = () => {
