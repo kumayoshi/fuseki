@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const MemoItem = ({ memoText, stone, categoryText, memoDate, articleId }) => {
+  console.log("memoItem memoText : ", memoText);
   return (
     <li style={styles.ItemWrap}>
       <Link style={styles.ItemWrapIn} to={"/article/" + articleId}>

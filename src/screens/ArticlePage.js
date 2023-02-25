@@ -16,11 +16,11 @@ import { useParams } from "react-router-dom";
 import backArrow from "../assets/images/backArrow.svg";
 
 import stone from "../assets/images/stone.svg";
-import stoneMomo from "../assets/images/stone_momo.svg";
-import stoneAka from "../assets/images/stone_aka.svg";
-import stoneAomidori from "../assets/images/stone_aomidori.svg";
-import stoneAsagi from "../assets/images/stone_asagi.svg";
-import stoneKi from "../assets/images/stone_ki.svg";
+import stoneMomo from "../assets/images/stoneMomo.svg";
+import stoneAka from "../assets/images/stoneAka.svg";
+import stoneAomidori from "../assets/images/stoneAomidori.svg";
+import stoneAsagi from "../assets/images/stoneAsagi.svg";
+import stoneKi from "../assets/images/stoneKi.svg";
 
 const ArticlePage = () => {
   // メモ一覧の記事データベース
