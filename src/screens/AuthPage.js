@@ -99,16 +99,23 @@ const AuthPage = () => {
   const getCategory = async () => {
     const todoQuery = query(collection(db, "categoryList"));
     await getDocs(todoQuery).then((querySnapshot) => {
-      querySnapshot.docs.map((doc) => {
-        setCategoryList((beforeCategoryList) => [
-          ...beforeCategoryList,
-          {
-            id: doc.id,
-            categoryName: doc.data().categoryName,
-            stoneImg: getCategoryStone(doc.data().stoneImg),
-          },
-        ]);
+      const categoryListStoring = [];
+      querySnapshot.docs.map((doc, index) => {
+        categoryListStoring[index] = {
+          id: doc.id,
+          categoryName: doc.data().categoryName,
+          stoneImg: getCategoryStone(doc.data().stoneImg),
+        };
+        // setCategoryList((beforeCategoryList) => [
+        //   ...beforeCategoryList,
+        //   {
+        //     id: doc.id,
+        //     categoryName: doc.data().categoryName,
+        //     stoneImg: getCategoryStone(doc.data().stoneImg),
+        //   },
+        // ]);
       });
+      setCategoryList(categoryListStoring);
     });
   };
 
@@ -127,16 +134,16 @@ const AuthPage = () => {
   };
 
   // categoryListの重複分の解消
-  useEffect(() => {
-    setUniqueCategoryList(
-      Array.from(
-        new Map(
-          categoryList.map((categoryItem) => [categoryItem.id, categoryItem])
-        ).values()
-      )
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [categoryList]);
+  // useEffect(() => {
+  //   setUniqueCategoryList(
+  //     Array.from(
+  //       new Map(
+  //         categoryList.map((categoryItem) => [categoryItem.id, categoryItem])
+  //       ).values()
+  //     )
+  //   );
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [categoryList]);
 
   // ログイン監視
   useEffect(() => {
@@ -238,7 +245,7 @@ const AuthPage = () => {
           <div style={styles.bottomBlock}>
             <h2 style={styles.itemTitle}>カテゴリ</h2>
             <ul className={"categorylist"}>
-              {uniqueCategoryList.map((item, index) => {
+              {categoryList.map((item, index) => {
                 return (
                   <li className={"categorylistItem"} key={index}>
                     <p className={"categorylistItemText"}>
