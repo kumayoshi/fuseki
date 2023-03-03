@@ -1,6 +1,6 @@
 import React from "react";
 
-const SignButton = ({ label, onClick, style }) => {
+const SignButton = ({ label, onClick }) => {
   return (
     <button style={styles.submitButton} onClick={(e) => onClick(e)}>
       {label}

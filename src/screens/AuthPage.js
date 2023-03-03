@@ -1,22 +1,36 @@
 import React, { useState, useEffect } from "react";
+// style
 import "./CommonStyles.css";
 import "./CategoryListStyle.css";
 import CommonStyles from "./CommonStyles.css";
-import { auth } from "../firebase";
+// component
 import Header from "../components/Header";
-import { signOut, onAuthStateChanged } from "firebase/auth";
+import Button from "../components/Articlebutton";
+import AccountDeleteModal from "../components/AccountDeleteModal";
+// react-router-dom
 import { useNavigate } from "react-router-dom";
-
-import stone from "../assets/images/stone.svg";
-import stoneMomo from "../assets/images/stone_momo.svg";
-import stoneAka from "../assets/images/stone_aka.svg";
+// firebase
+import { signOut, onAuthStateChanged, deleteUser } from "firebase/auth";
+import { auth, db } from "../firebase";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
+// images
+import stoneNormal from "../assets/images/stoneNormal.svg";
+import stoneMomo from "../assets/images/stoneMomo.svg";
+import stoneAka from "../assets/images/stoneAka.svg";
 import stoneAkacha from "../assets/images/stone_akacha.svg";
 import stoneAkaki from "../assets/images/stone_akaki.svg";
 import stoneAo from "../assets/images/stone_ao.svg";
-import stoneAomidori from "../assets/images/stone_aomidori.svg";
-import stoneAsagi from "../assets/images/stone_asagi.svg";
+import stoneAomidori from "../assets/images/stoneAomidori.svg";
+import stoneAsagi from "../assets/images/stoneAsagi.svg";
 import stoneCha from "../assets/images/stone_cha.svg";
-import stoneKi from "../assets/images/stone_ki.svg";
+import stoneKi from "../assets/images/stoneKi.svg";
 import stoneKimidori from "../assets/images/stone_kimidori.svg";
 import stoneKoke from "../assets/images/stone_koke.svg";
 import stoneOrange from "../assets/images/stone_orange.svg";
@@ -28,45 +42,6 @@ import stoneUsumomo from "../assets/images/stone_usumomo.svg";
 
 const AuthPage = () => {
   const [iconActive, setIconActive] = useState(false);
-
-  const CategoryList = [
-    {
-      categoryId: 1,
-      categoryName: "それ素敵",
-      categoryItem: 0,
-      stoneImg: stoneMomo,
-    },
-    {
-      categoryId: 2,
-      categoryName: "これから",
-      categoryItem: 0,
-      stoneImg: stoneAsagi,
-    },
-    {
-      categoryId: 3,
-      categoryName: "日々をつぶやく",
-      categoryItem: 0,
-      stoneImg: stone,
-    },
-    {
-      categoryId: 4,
-      categoryName: "ふと思う",
-      categoryItem: 0,
-      stoneImg: stoneAomidori,
-    },
-    {
-      categoryId: 5,
-      categoryName: "この瞬間をしたためる",
-      categoryItem: 0,
-      stoneImg: stoneKi,
-    },
-    {
-      categoryId: 6,
-      categoryName: "どこにも言えないこの気持ち",
-      categoryItem: 0,
-      stoneImg: stoneAka,
-    },
-  ];
 
   // const stoneImgs = [
   //   Stone,
@@ -87,18 +62,152 @@ const AuthPage = () => {
   //   StoneUsuki,
   //   StoneUsumomo,
   // ];
-  // ログイン監視
+
+  // カテゴリを格納する変数
+  const [categoryList, setCategoryList] = useState([]);
+  // 各脳されたカテゴリから重複分を削除したものを各脳する変数
+  const [uniqueCategoryList, setUniqueCategoryList] = useState([]);
+  // カテゴリの石画像に関する変数
+  let categoryStoneStoring;
+  const stoneImg = [
+    stoneMomo,
+    stoneKi,
+    stoneAomidori,
+    stoneAka,
+    stoneNormal,
+    stoneAsagi,
+  ];
+  // mailaddress,passwordを各脳する変数
+  const [mailaddress, setMailaddress] = useState("");
+  const [password, setPassword] = useState("");
   const [user, setUser] = useState("");
+  // アカウント削除の確認用モーダルウィンドウフラッグ
+  const [accountDeleteModal, setAccountDeleteModal] = useState(false);
+
+  // カテゴリ
+  // -----------categoryList格納時に画像srcと照合する
+  const getCategoryStone = (src) => {
+    stoneImg.forEach((item) => {
+      if (item.indexOf(src) !== -1) {
+        categoryStoneStoring = item;
+        return true;
+      }
+    });
+    return categoryStoneStoring;
+  };
+  // -----------表示の際にカテゴリの取得
+  const getCategory = async () => {
+    const todoQuery = query(collection(db, "categoryList"));
+    await getDocs(todoQuery).then((querySnapshot) => {
+      querySnapshot.docs.map((doc) => {
+        setCategoryList((beforeCategoryList) => [
+          ...beforeCategoryList,
+          {
+            id: doc.id,
+            categoryName: doc.data().categoryName,
+            stoneImg: getCategoryStone(doc.data().stoneImg),
+          },
+        ]);
+      });
+    });
+  };
+
+  // メールアドレス、パスワード
+  const getAccountInformation = async (currentUser) => {
+    const userQuery = query(
+      collection(db, "userList"),
+      where("signInUserId", "==", currentUser.uid)
+    );
+    await getDocs(userQuery).then((querySnapshot) => {
+      querySnapshot.docs.map((doc) => {
+        setMailaddress(doc.data().mailaddress);
+        setPassword(doc.data().password);
+      });
+    });
+  };
+
+  // categoryListの重複分の解消
+  useEffect(() => {
+    setUniqueCategoryList(
+      Array.from(
+        new Map(
+          categoryList.map((categoryItem) => [categoryItem.id, categoryItem])
+        ).values()
+      )
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categoryList]);
+
+  // ログイン監視
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      getAccountInformation(currentUser);
     });
+    getCategory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // ログアウト
   const navigate = useNavigate();
   const LogOut = async () => {
     await signOut(auth);
     navigate("/");
+  };
+
+  // アカウント削除
+  // -----------アカウントを削除するかの確認モーダル
+  const accountSwitchDeleteModal = () => {
+    accountDeleteModal
+      ? setAccountDeleteModal(false)
+      : setAccountDeleteModal(true);
+  };
+  const accountDeleteModalCancel = () => {
+    setAccountDeleteModal(false);
+  };
+  // -----------ユーザ削除
+  const accountUserListDelete = async () => {
+    const deleteUserQuery = query(
+      collection(db, "userList"),
+      where("signInUserId", "==", user.uid)
+    );
+    await getDocs(deleteUserQuery).then((querySnapshot) => {
+      querySnapshot.docs.map((doc) => {
+        console.log("ユーザリストから", doc.id, "を削除します。");
+        // deleteDoc(doc(db, "userList", doc.id));
+      });
+    });
+  };
+  // -----------ユーザに関するメモを削除
+  const accountMemoListDelete = async () => {
+    // const batch = db.batch();
+    const deleteMemoListQuery = query(
+      collection(db, "memoList"),
+      where("userId", "==", user.uid)
+    );
+    await getDocs(deleteMemoListQuery).then((querySnapshot) => {
+      querySnapshot.docs.map((doc) => {
+        console.log(
+          "メモリストから",
+          doc.id,
+          doc.data().title,
+          "を削除します。"
+        );
+        // batch.delete(doc.ref);
+      });
+    });
+  };
+  // -----------ユーザに関するメモを削除
+  const accountDelete = () => {
+    // deleteUser(user)
+    //   .then(() => {
+    // userlistから該当するユーザを削除
+    // accountUserListDelete();
+    // memolistから該当するメモを削除
+    accountMemoListDelete();
+    // })
+    // .catch((error) => {
+    //   console.log("error : ", error);
+    // });
   };
 
   return (
@@ -108,30 +217,42 @@ const AuthPage = () => {
         <div>
           <div>
             <h2 style={styles.itemTitle}>メールアドレス</h2>
-            <p style={styles.itemContent}>yyy@example.com</p>
+            <input
+              type="text"
+              value={mailaddress}
+              style={styles.itemContent}
+              readOnly
+            />
             {/* <p style={styles.itemAttention}><a href={}>メールアドレスの変更</a></p> */}
           </div>
           <div style={styles.bottomBlock}>
             <h2 style={styles.itemTitle}>パスワード</h2>
-            <p style={styles.itemContent}>・・・・・・・・・</p>
+            <input
+              type="password"
+              value={password}
+              style={styles.itemContent}
+              readOnly
+            />
             {/* <p style={styles.itemAttention}><a href={}>パスワードの変更</a></p> */}
           </div>
           <div style={styles.bottomBlock}>
             <h2 style={styles.itemTitle}>カテゴリ</h2>
             <ul className={"categorylist"}>
-              {CategoryList.map((CategoryItem, index) => (
-                <li className={"categorylistItem"} key={index}>
-                  <p className={"categorylistItemText"}>
-                    {CategoryItem.categoryName}
-                  </p>
-                  <i
-                    onClick={() => setIconActive(!iconActive)}
-                    className={"categorylistItemIcon"}
-                  >
-                    <img src={CategoryItem.stoneImg} alt="" />
-                  </i>
-                </li>
-              ))}
+              {uniqueCategoryList.map((item, index) => {
+                return (
+                  <li className={"categorylistItem"} key={index}>
+                    <p className={"categorylistItemText"}>
+                      {item.categoryName}
+                    </p>
+                    <i
+                      onClick={() => setIconActive(!iconActive)}
+                      className={"categorylistItemIcon"}
+                    >
+                      <img src={item.stoneImg} alt="" />
+                    </i>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
@@ -166,9 +287,25 @@ const AuthPage = () => {
             </ul>
           </div> */}
 
-          <button onClick={() => LogOut()}>ログアウト</button>
+          <Button
+            onClick={() => LogOut()}
+            text={"ログアウト"}
+            styleName={styles.signOutButton}
+          ></Button>
+
+          <Button
+            onClick={() => accountSwitchDeleteModal()}
+            text={"アカウント削除"}
+            styleName={styles.accountDeleteButton}
+          ></Button>
         </div>
       </div>
+
+      <AccountDeleteModal
+        modalFlug={accountDeleteModal}
+        cancel={() => accountDeleteModalCancel()}
+        accountDelete={() => accountDelete()}
+      />
     </div>
   );
 };
@@ -204,6 +341,7 @@ const styles = {
     marginTop: "1vw",
     fontWeight: "bold",
     background: "#fff",
+    pointerEvents: "none",
   },
   bottomBlock: {
     marginTop: "9vw",
@@ -214,5 +352,33 @@ const styles = {
     marginTop: "1vw",
     padding: "0 3vw",
     textAlign: "right",
+  },
+  signOutButton: {
+    width: "49vw",
+    margin: "16vw auto 0px",
+    display: "block",
+    padding: "2vw 0",
+    boxSizing: "border-box",
+    textAlign: "center",
+    fontSize: "4vw",
+    fontWeight: "bold",
+    border: "1vw solid #F27855",
+    color: "#F27855",
+    borderRadius: "8px",
+    background: "#fff",
+  },
+  accountDeleteButton: {
+    width: "49vw",
+    margin: "7vw auto 0px",
+    display: "block",
+    padding: "2vw 0",
+    boxSizing: "border-box",
+    textAlign: "center",
+    fontSize: "4vw",
+    fontWeight: "bold",
+    border: "1vw solid #F27855",
+    color: "#fff",
+    borderRadius: "8px",
+    background: "#F27855",
   },
 };

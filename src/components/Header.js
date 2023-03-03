@@ -7,7 +7,7 @@ const Header = ({ currentPage, user }) => {
     return (
       <header>
         <figure>
-          <a href={"/todoList/"}>
+          <a href={"/memolist/"}>
             <img src={Logo} alt="ロゴ" />
           </a>
         </figure>
