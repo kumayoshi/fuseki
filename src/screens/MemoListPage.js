@@ -11,7 +11,7 @@ import {
   query,
   where,
   // deleteDoc,
-  // serverTimestamp,
+  serverTimestamp,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import MemoItem from "../components/MemoItem";
@@ -19,7 +19,7 @@ import MemoFilter from "../components/MemoFilter";
 import stoneShadow from "../assets/images/stone_shadow.svg";
 import newArticle from "../assets/images/newMemo.svg";
 // 各カテゴエリー石の画像
-import stone from "../assets/images/stone.svg";
+import stoneNormal from "../assets/images/stoneNormal.svg";
 import stoneMomo from "../assets/images/stoneMomo.svg";
 import stoneAka from "../assets/images/stoneAka.svg";
 import stoneAomidori from "../assets/images/stoneAomidori.svg";
@@ -27,146 +27,11 @@ import stoneAsagi from "../assets/images/stoneAsagi.svg";
 import stoneKi from "../assets/images/stoneKi.svg";
 
 const SignUpPage = () => {
-  // メモ一覧の記事データベース
-  // const memoList = [
-  //   {
-  //     userId: 1,
-  //     itemId: 1,
-  //     title: "ここで働くということ",
-  //     text: "ここには本文がたくさん入ります。データに入れる際の改行とかどうするんだろう。",
-  //     trigger: "ここにはメモをしようと思ったきっかけが入ります。",
-  //     date: "2022/10/10 10:00",
-  //     categoryId: 1,
-  //   },
-  //   {
-  //     userId: 1,
-  //     itemId: 2,
-  //     title: "言語は人を分断し結合する",
-  //     text: "分けることもできれば、結束を生むこともできる",
-  //     trigger: "超相対性理論を聞いてのメモ",
-  //     date: "2023/10/27 10:00",
-  //     categoryId: 5,
-  //   },
-  //   {
-  //     userId: 1,
-  //     itemId: 3,
-  //     title: "遊びとは自由であることだ",
-  //     text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
-  //     trigger: "超相対性理論を聞いてのメモ",
-  //     date: "2023/11/27 10:00",
-  //     categoryId: 3,
-  //   },
-  //   {
-  //     userId: 1,
-  //     itemId: 3,
-  //     title:
-  //       "仕事を楽しんでやっているという人は自由に生きるリテラシーを持っているるるるるるるるる",
-  //     text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
-  //     trigger: "超相対性理論を聞いてのメモ",
-  //     date: "2023/12/27 10:00",
-  //     categoryId: 4,
-  //   },
-  //   {
-  //     userId: 1,
-  //     itemId: 3,
-  //     title:
-  //       "仕事を楽しんでやっているという人は自由に生きるリテラシーを持っている仕事を楽しんでやっているという人は自由に生きるリテラシーを持っている仕事を楽しんでやっているという人は自由に生きるリテラシーを持っている仕事を楽しんでやっているという人は自由に生きるリテラシーを持っている",
-  //     text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
-  //     trigger: "超相対性理論を聞いてのメモ",
-  //     date: "2023/12/27 10:00",
-  //     categoryId: 4,
-  //   },
-  //   {
-  //     userId: 1,
-  //     itemId: 3,
-  //     title: "遊びとは自由であることだ",
-  //     text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
-  //     trigger: "超相対性理論を聞いてのメモ",
-  //     date: "2023/11/27 10:00",
-  //     categoryId: 3,
-  //   },
-  //   {
-  //     userId: 1,
-  //     itemId: 3,
-  //     title:
-  //       "仕事を楽しんでやっているという人は自由に生きるリテラシーを持っている",
-  //     text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
-  //     trigger: "超相対性理論を聞いてのメモ",
-  //     date: "2023/12/27 10:00",
-  //     categoryId: 4,
-  //   },
-  // ];
-
-  // 各登録済みカテゴリのデータベース
-  // const categoryList = [
-  //   {
-  //     categoryId: 1,
-  //     categoryName: "それ素敵",
-  //     stoneImg: stoneMomo,
-  //   },
-  //   {
-  //     categoryId: 2,
-  //     categoryName: "これから",
-  //     stoneImg: stoneAsagi,
-  //   },
-  //   {
-  //     categoryId: 3,
-  //     categoryName: "日々をつぶやく",
-  //     stoneImg: stone,
-  //   },
-  //   {
-  //     categoryId: 4,
-  //     categoryName: "ふと思う",
-  //     stoneImg: stoneAomidori,
-  //   },
-  //   {
-  //     categoryId: 5,
-  //     categoryName: "この瞬間をしたためる",
-  //     stoneImg: stoneKi,
-  //   },
-  //   {
-  //     categoryId: 6,
-  //     categoryName: "どこにも言えないこの気持ち",
-  //     stoneImg: stoneAka,
-  //   },
-  // ];
-
-  // const userList = [
-  //   {
-  //     userId: 1,
-  //     email: "yyy@example.com", //メールアドレス
-  //     password: "pass", //パスワード
-  //     dateList: {
-  //       year: ["2022", "2023"],
-  //       month: [
-  //         [10, 11, 12],
-  //         [1, 2],
-  //       ],
-  //     },
-  //     categoryList: [
-  //       {
-  //         categoryId: "QEZ9W6oa85dxe1U5xfxm",
-  //         categoryTotalCount: 20,
-  //         lastyearcategoryTotalCount: 18,
-  //       },
-  //     ],
-  //     memoTotalCount: 20,
-  //   },
-  //   {
-  //     userId: 2,
-  //     email: "yyy@example.com", //メールアドレス
-  //     password: "pass", //パスワード
-  //     dateList: {
-  //       year: ["2022", "2023"],
-  //       month: [[12], [1]],
-  //     },
-  //     categoryList: [2, 3],
-  //     memoTotalCount: 20,
-  //   },
-  // ];
-
   // userDocID　記憶
   // const [userDocID, setUserDocID] = useState("");
+
+  // ログインしているユーザ
+  const [user, setUser] = useState("");
 
   // category絞り込み時の石の画像保存用変数
   const [filterCategoryImg, setFilterCategoryImg] = useState(stoneShadow);
@@ -176,22 +41,14 @@ const SignUpPage = () => {
   const [filterYearText, setFilterYearText] = useState("年/月");
   // 日付絞り込み時の日付保存用変数
   const [filterYearLabel, setFilterYearLabel] = useState("-");
-
   // categoryListを一旦宣言する
   const [categoryList, setCategoryList] = useState([]);
-
   // 絞り込みモーダルのタイプ
   const [modalType, setModalType] = useState("none"); // none , date , category
-
-  // ログインしているユーザ
-  const [user, setUser] = useState("");
-
   // memolistを一旦宣言する
   const [memoList, setMemoList] = useState([]);
-  let list = [];
-
   // filter後の配列　保存用のステート
-  const [memoListChaged, setMemoListChaged] = useState(memoList);
+  const [memoListChaged, setMemoListChaged] = useState([]);
 
   // メモ一覧の記事データベース
   const memoGetFunc = async (userID) => {
@@ -200,28 +57,28 @@ const SignUpPage = () => {
       where("userId", "==", userID)
     );
     await getDocs(memoQuery).then((querySnapshot) => {
+      const memoStoringArray = [];
       querySnapshot.docs.map((doc, index) => {
-        const memo = {
+        memoStoringArray[index] = {
           itemId: doc.id,
           text: doc.data().text,
           title: doc.data().title,
           trigger: doc.data().trigger,
           userId: doc.data().userId,
-          date: doc.data().dateTime,
+          date: doc.data().date.toDate(),
           categoryId: doc.data().categoryId,
         };
-        list.push(memo);
       });
+      setMemoList(memoStoringArray);
+      setMemoListChaged(memoStoringArray);
     });
-    setMemoList(list);
-    console.log("memoList : ", memoList);
   };
 
   // useEffect;
 
   // 画像の変数を配列に格納
   const categoryStoneArray = [
-    stone,
+    stoneNormal,
     stoneMomo,
     stoneAka,
     stoneAomidori,
@@ -241,10 +98,7 @@ const SignUpPage = () => {
   };
   // カテゴリー一覧の記事データベース
   const memoCategoryGetFunc = async () => {
-    const categoryQuery = query(
-      collection(db, "categoryList")
-      // where("userId", "==", userID)
-    );
+    const categoryQuery = query(collection(db, "categoryList"));
     await getDocs(categoryQuery).then((querySnapshot) => {
       querySnapshot.docs.map((doc, index) => {
         categoryList[index] = {
@@ -261,7 +115,7 @@ const SignUpPage = () => {
       (cateitem) => cateitem.categoryId === itemCategoryID
     );
   };
-
+  // 絞り込みモーダルの表示切り替え
   const modalTypeChanged = (type) => {
     type === modalType ? setModalType("none") : setModalType(type);
   };
@@ -347,8 +201,6 @@ const SignUpPage = () => {
     }
   };
 
-  console.log("memoListChaged : ", memoListChaged);
-
   useEffect(() => {
     // const authAsync = async () => {
     //   await onAuthStateChanged(auth, (currentUser) => {
@@ -357,17 +209,18 @@ const SignUpPage = () => {
     //     memoGetFunc(currentUser?.uid);
     //   });
     // };
-    let uid = "iutwD2YGs8anyznA1peKRWhe7n33";
     onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      memoGetFunc(currentUser.uid);
     });
     memoCategoryGetFunc();
-    memoGetFunc(uid);
   }, []);
-
-  useEffect(() => {
-    console.log("memoList : ", memoList);
-  }, [memoList]);
+  // 重複分解消
+  // useEffect(() => {
+  //   // 表示するメモ各脳変数の重複分を削除
+  //   // setMemoListChaged(memoList);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [memoList]);
 
   return (
     <div className={CommonStyles.wrap}>
@@ -377,14 +230,13 @@ const SignUpPage = () => {
           {memoListChaged &&
             memoListChaged.map((item, index) => {
               const itemCategory = itemCategoryFind(item.categoryId);
-              console.log("364 itemCategory", itemCategory);
               return (
                 <MemoItem
                   memoText={item.title}
                   stone={itemCategory.stoneImg}
                   categoryText={itemCategory.categoryName}
                   articleId={item.itemId}
-                  memoDate={item.date}
+                  // memoDate={item.date}
                   key={index}
                 />
               );
