@@ -15,12 +15,12 @@ import { useParams } from "react-router-dom";
 
 import backArrow from "../assets/images/backArrow.svg";
 
-import stone from "../assets/images/stone.svg";
-import stoneMomo from "../assets/images/stone_momo.svg";
-import stoneAka from "../assets/images/stone_aka.svg";
-import stoneAomidori from "../assets/images/stone_aomidori.svg";
-import stoneAsagi from "../assets/images/stone_asagi.svg";
-import stoneKi from "../assets/images/stone_ki.svg";
+import stoneNormal from "../assets/images/stoneNormal.svg";
+import stoneMomo from "../assets/images/stoneMomo.svg";
+import stoneAka from "../assets/images/stoneAka.svg";
+import stoneAomidori from "../assets/images/stoneAomidori.svg";
+import stoneAsagi from "../assets/images/stoneAsagi.svg";
+import stoneKi from "../assets/images/stoneKi.svg";
 
 const ArticlePage = () => {
   // メモ一覧の記事データベース
@@ -82,7 +82,7 @@ const ArticlePage = () => {
       categoryId: 3,
       categoryName: "日々をつぶやく",
       categoryItem: 0,
-      stoneImg: stone,
+      stoneImg: stoneNormal,
     },
     {
       categoryId: 4,
@@ -114,8 +114,8 @@ const ArticlePage = () => {
   const [itemCategory, setItemCategory] = useState("");
   useEffect(() => {
     if (params.id !== "new") {
-      itemId = parseInt(params.id, 10);
-      item = memoList.find((memoItem) => memoItem.itemId === itemId);
+      // itemId = parseInt(params.id, 10);
+      // item = memoList.find((memoItem) => memoItem.itemId === itemId);
       setItemTitle(item.title);
       setItemText(item.text);
       setItemTrigger(item.trigger);
