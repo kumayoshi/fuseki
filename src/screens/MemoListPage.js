@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
+// style
 import "./CommonStyles.css";
 import CommonStyles from "./CommonStyles.css";
-import Header from "../components/Header";
+// firebase
 import { auth, db } from "../firebase";
 import {
   // doc,
@@ -14,11 +15,13 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+// component
+import Header from "../components/Header";
 import MemoItem from "../components/MemoItem";
 import MemoFilter from "../components/MemoFilter";
+// images
 import stoneShadow from "../assets/images/stone_shadow.svg";
 import newArticle from "../assets/images/newMemo.svg";
-// 各カテゴエリー石の画像
 import stoneNormal from "../assets/images/stoneNormal.svg";
 import stoneMomo from "../assets/images/stoneMomo.svg";
 import stoneAka from "../assets/images/stoneAka.svg";
@@ -27,9 +30,6 @@ import stoneAsagi from "../assets/images/stoneAsagi.svg";
 import stoneKi from "../assets/images/stoneKi.svg";
 
 const SignUpPage = () => {
-  // userDocID　記憶
-  // const [userDocID, setUserDocID] = useState("");
-
   // ログインしているユーザ
   const [user, setUser] = useState("");
 
@@ -73,8 +73,6 @@ const SignUpPage = () => {
       setMemoListChaged(memoStoringArray);
     });
   };
-
-  // useEffect;
 
   // 画像の変数を配列に格納
   const categoryStoneArray = [
@@ -154,8 +152,6 @@ const SignUpPage = () => {
     }
   };
 
-  // カテゴリと石の画像配列の称号
-
   // date絞り込み
   const filterDateDisable = () => {
     modalTypeChanged("none");
@@ -201,26 +197,15 @@ const SignUpPage = () => {
     }
   };
 
+  // ログイン監視、メモ・カテゴリー読み込み関数群
   useEffect(() => {
-    // const authAsync = async () => {
-    //   await onAuthStateChanged(auth, (currentUser) => {
-    //     setUser(currentUser);
-    //     memoCategoryGetFunc();
-    //     memoGetFunc(currentUser?.uid);
-    //   });
-    // };
     onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       memoGetFunc(currentUser.uid);
     });
     memoCategoryGetFunc();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  // 重複分解消
-  // useEffect(() => {
-  //   // 表示するメモ各脳変数の重複分を削除
-  //   // setMemoListChaged(memoList);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [memoList]);
 
   return (
     <div className={CommonStyles.wrap}>

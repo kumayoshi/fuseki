@@ -1,20 +1,33 @@
 import React, { useState, useEffect } from "react";
+// style
 import "./CommonStyles.css";
 import CommonStyles from "./CommonStyles.css";
-// import { auth } from "../firebase";
+// firebase
 import Header from "../components/Header";
+import { auth, db } from "../firebase";
+import {
+  doc,
+  collection,
+  addDoc,
+  updateDoc,
+  getDocs,
+  getDoc,
+  query,
+  deleteDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+// component
 import ArticleTitle from "../components/ArticleTitle";
 import ArticleText from "../components/ArticleText";
 import ArticleTrigger from "../components/ArticleTrigger";
 import ArticleCategory from "../components/ArticleCategory";
 import Articlebutton from "../components/Articlebutton";
 import ArticleDeleteComfirm from "../components/ArticleDeleteComfirm";
-
-// import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { useParams } from "react-router-dom";
-
+// library
+import { useParams, useNavigate } from "react-router-dom";
+// images
 import backArrow from "../assets/images/backArrow.svg";
-
 import stoneNormal from "../assets/images/stoneNormal.svg";
 import stoneMomo from "../assets/images/stoneMomo.svg";
 import stoneAka from "../assets/images/stoneAka.svg";
@@ -23,124 +36,146 @@ import stoneAsagi from "../assets/images/stoneAsagi.svg";
 import stoneKi from "../assets/images/stoneKi.svg";
 
 const ArticlePage = () => {
-  // メモ一覧の記事データベース
-  const memoList = [
-    {
-      userId: 1,
-      itemId: 1,
-      title: "ここで働くということ",
-      text: "ここには本文がたくさん入ります。データに入れる際の改行とかどうするんだろう。",
-      trigger: "ここにはメモをしようと思ったきっかけが入ります。",
-      date: "2022/10/10 10:00",
-      categoryId: 1,
-    },
-    {
-      userId: 1,
-      itemId: 2,
-      title: "言語は人を分断し結合する",
-      text: "分けることもできれば、結束を生むこともできる",
-      trigger: "超相対性理論を聞いてのメモ",
-      date: "2023/10/27 10:00",
-      categoryId: 5,
-    },
-    {
-      userId: 1,
-      itemId: 3,
-      title: "遊びとは自由であることだ",
-      text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
-      trigger: "超相対性理論を聞いてのメモ",
-      date: "2023/11/27 10:00",
-      categoryId: 3,
-    },
-    {
-      userId: 1,
-      itemId: 3,
-      title:
-        "仕事を楽しんでやっているという人は自由に生きるリテラシーを持っている",
-      text: "遊びとは自由であることだ。そこにタスクや目的がたされてしまうと仕事になってしまう。",
-      trigger: "超相対性理論を聞いてのメモ",
-      date: "2023/12/27 10:00",
-      categoryId: 4,
-    },
-  ];
-
-  // 各登録済みカテゴリのデータベース
-  const categoryList = [
-    {
-      categoryId: 1,
-      categoryName: "それ素敵",
-      categoryItem: 0,
-      stoneImg: stoneMomo,
-    },
-    {
-      categoryId: 2,
-      categoryName: "これから",
-      categoryItem: 0,
-      stoneImg: stoneAsagi,
-    },
-    {
-      categoryId: 3,
-      categoryName: "日々をつぶやく",
-      categoryItem: 0,
-      stoneImg: stoneNormal,
-    },
-    {
-      categoryId: 4,
-      categoryName: "ふと思う",
-      categoryItem: 0,
-      stoneImg: stoneAomidori,
-    },
-    {
-      categoryId: 5,
-      categoryName: "この瞬間をしたためる",
-      categoryItem: 0,
-      stoneImg: stoneKi,
-    },
-    {
-      categoryId: 6,
-      categoryName: "どこにも言えないこの気持ち",
-      categoryItem: 0,
-      stoneImg: stoneAka,
-    },
-  ];
-
+  // useNavigateの変数
+  const navigate = useNavigate();
+  // ログインしているユーザ
+  const [user, setUser] = useState("");
+  // カテゴリリスト格納用の変数
+  const [categoryList, setCategoryList] = useState([]);
   // 読み込み時id参照
   const params = useParams();
-  let itemId = "";
-  let item = "";
+  // 読み込み時id格納用の変数
+  const [memoParams, setMemoParams] = useState([]);
+  // 取得したメモのreferens
+  const [memoItemRef, setMemoItemRef] = useState([]);
+  // 取得したメモの記事格納用変数
+  const [memoItem, setMemoItem] = useState([]);
+  // 各項目記憶用の変数
   const [itemTitle, setItemTitle] = useState("");
   const [itemText, setItemText] = useState("");
   const [itemTrigger, setItemTrigger] = useState("");
   const [itemCategory, setItemCategory] = useState("");
-  useEffect(() => {
-    if (params.id !== "new") {
-      // itemId = parseInt(params.id, 10);
-      // item = memoList.find((memoItem) => memoItem.itemId === itemId);
-      setItemTitle(item.title);
-      setItemText(item.text);
-      setItemTrigger(item.trigger);
-      setItemCategory(item.categoryId);
+  // 記事削除確認モーダル表示非表示フラッグ
+  const [itemDeleteModal, setItemDeleteModal] = useState(false);
+  // 該当記事取得
+  const setMemoItemStoring = async (memoItemId) => {
+    if (memoItemId !== "new") {
+      const docRef = doc(db, "memoList", memoItemId);
+      setMemoItemRef(docRef);
+      const docSnap = await getDoc(docRef);
+      setMemoItem({
+        itemId: docSnap.id,
+        text: docSnap.data().text,
+        title: docSnap.data().title,
+        trigger: docSnap.data().trigger,
+        userId: docSnap.data().userId,
+        date: docSnap.data().date.toDate(),
+        categoryId: docSnap.data().categoryId,
+      });
     }
-  }, []);
+    setMemoParams(memoItemId);
+  };
+
+  // カテゴリーデータベースの並び替え
+  const categoryListSort = (categoryListArray) => {
+    let categoryListStoring = categoryListArray.sort(function (a, b) {
+      if (a.categorySortIndex > b.categorySortIndex) {
+        return 1;
+      } else {
+        return -1;
+      }
+    });
+    setCategoryList(categoryListStoring);
+  };
+  // カテゴリー一覧の記事データベース
+  const memoCategoryGetFunc = async () => {
+    const categoryQuery = query(collection(db, "categoryList"));
+    let categoryListArray = [];
+    await getDocs(categoryQuery).then((querySnapshot) => {
+      querySnapshot.docs.map((doc, index) => {
+        categoryListArray[index] = {
+          categoryId: doc.id,
+          categoryName: doc.data().categoryName,
+          categorySortIndex: doc.data().categorySortIndex,
+        };
+      });
+    });
+    categoryListSort(categoryListArray);
+  };
+  // 読み込み時すでに入力されている項目に入力しておく
+  useEffect(() => {
+    setItemTitle(memoItem.title);
+    setItemText(memoItem.text);
+    setItemTrigger(memoItem.trigger);
+    setItemCategory(memoItem.categoryId);
+  }, [memoItem]);
+  // category の変更関数
   const itemCategoryChanged = (item) => {
     setItemCategory(item.target.value);
   };
-
-  console.log(itemText);
-
-  const [itemDeleteModal, setItemDeleteModal] = useState(false);
-  const buttonSave = () => {
-    console.log("保存しました");
+  // 内容更新
+  const memoItemUpdate = async () => {
+    await updateDoc(memoItemRef, {
+      text: itemText,
+      title: itemTitle,
+      trigger: itemTrigger,
+      date: serverTimestamp(),
+      categoryId: itemCategory,
+    });
   };
+  // 内容更新
+  const memoCreate = async () => {
+    try {
+      await addDoc(collection(db, "memoList"), {
+        text: itemText ? itemText : "",
+        title: itemTitle ? itemTitle : "",
+        trigger: itemTrigger ? itemTrigger : "",
+        date: serverTimestamp(),
+        categoryId: itemCategory ? itemCategory : "n3TrqVLKqtdVhWxvK59r",
+        userId: user.uid,
+      });
+      navigate("/memolist/");
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
+  // 保存ボタンクリック時の処理
+  const buttonSave = () => {
+    if (memoParams !== "new") {
+      memoItemUpdate();
+    } else {
+      memoCreate();
+    }
+  };
+  // 削除確認モーダル表示
   const buttonDeleteComfirm = () => {
     itemDeleteModal ? setItemDeleteModal(false) : setItemDeleteModal(true);
   };
+  // 削除確認モーダル非表示
   const buttonDeleteComfirmCancel = () => {
     setItemDeleteModal(false);
   };
-  const buttonDelete = () => {
-    console.log("削除しました");
+  // 削除処理実行
+  const memoItemDelete = () => {
+    deleteDoc(doc(db, "memoList", memoItem.itemId));
+    navigate("/memolist/");
   };
+  const buttonDelete = () => {
+    memoItemDelete();
+  };
+  // ログイン監視、メモ・カテゴリー読み込み関数群
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    memoCategoryGetFunc();
+    if (params.id !== "new") {
+      setMemoItemStoring(params.id);
+    } else {
+      setMemoItemStoring("new");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className={CommonStyles.wrap}>
@@ -165,7 +200,7 @@ const ArticlePage = () => {
         />
         <div style={styles.buttonWrap}>
           <Articlebutton
-            text="確定"
+            text="保存"
             styleName={styles.save}
             onClick={() => buttonSave()}
           />

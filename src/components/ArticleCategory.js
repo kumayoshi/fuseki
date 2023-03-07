@@ -9,6 +9,12 @@ const ArticleCategory = ({ itemCategory, onChange, categoryList }) => {
       setFlug(true);
     }
   };
+  if (categoryList.length !== 0 && !itemCategory) {
+    let defaultItemCategory = categoryList.find(
+      (categoryitem) => categoryitem.categorySortIndex === "1"
+    );
+    itemCategory = defaultItemCategory.categoryId;
+  }
 
   return (
     <div style={styles.wrap}>
@@ -30,14 +36,11 @@ const ArticleCategory = ({ itemCategory, onChange, categoryList }) => {
         id=""
         onChange={(item) => onChange(item)}
         style={flug ? styles.input : styles.non}
+        value={itemCategory}
       >
         {categoryList.map((categoryItem) => {
           const categoryItemId = categoryItem.categoryId;
-          return categoryItemId === itemCategory ? (
-            <option value={categoryItemId} key={categoryItemId} selected>
-              {categoryItem.categoryName}
-            </option>
-          ) : (
+          return (
             <option value={categoryItemId} key={categoryItemId}>
               {categoryItem.categoryName}
             </option>
