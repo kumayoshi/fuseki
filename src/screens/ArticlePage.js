@@ -184,7 +184,7 @@ const ArticlePage = () => {
 
   return (
     <div className={CommonStyles.wrap}>
-      <Header currentPage="新規メモ" user="" />
+      <Header currentPage="新規メモ" user={user} />
       <div style={styles.wrap}>
         <ArticleText
           text={itemText}

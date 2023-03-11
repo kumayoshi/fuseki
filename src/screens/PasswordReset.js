@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
-// style
-import CommonStyles from "../assets/css/CommonStyles.css";
+import Header from "../components/Header";
+import SignButton from "../components/SignButton";
+import SignForm from "../components/SignForm";
 // firebase
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 // library
 import { useNavigate } from "react-router-dom";
-// component
-import Header from "../components/Header";
-import SignButton from "../components/SignButton";
-import SignForm from "../components/SignForm";
+// style
+import CommonStyles from "../assets/css/CommonStyles.css";
 
 const SignInPage = () => {
   // メールアドレス、パスワード格納用の変数

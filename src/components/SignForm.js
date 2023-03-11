@@ -8,7 +8,7 @@ const SignForm = ({ mailValue, onMailChange, passValue, onPassChange }) => {
           <p style={styles.labelText}>メールアドレス</p>
           <input
             type="email"
-            placeholder="メールアドレス"
+            placeholder="mail@example.com"
             // value={mailValue}
             onChange={(e) => onMailChange(e.target.value)}
             style={styles.inputText}
@@ -43,7 +43,7 @@ export default SignForm;
 
 const styles = {
   labelText: {
-    color: "rgba(67,67,67,0.4)",
+    color: "rgba(67,67,67,1)",
     fontSize: "3vw",
   },
   passwordBlock: {
