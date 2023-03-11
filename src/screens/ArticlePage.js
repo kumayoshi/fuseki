@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 // style
-import "./CommonStyles.css";
-import CommonStyles from "./CommonStyles.css";
+import CommonStyles from "../assets/css/CommonStyles.css";
 // firebase
 import Header from "../components/Header";
 import { auth, db } from "../firebase";
@@ -28,12 +27,13 @@ import ArticleDeleteComfirm from "../components/ArticleDeleteComfirm";
 import { useParams, useNavigate } from "react-router-dom";
 // images
 import backArrow from "../assets/images/backArrow.svg";
-import stoneNormal from "../assets/images/stoneNormal.svg";
-import stoneMomo from "../assets/images/stoneMomo.svg";
-import stoneAka from "../assets/images/stoneAka.svg";
-import stoneAomidori from "../assets/images/stoneAomidori.svg";
-import stoneAsagi from "../assets/images/stoneAsagi.svg";
-import stoneKi from "../assets/images/stoneKi.svg";
+// import stoneNormal from "../assets/images/stoneNormal.svg";
+// import stoneMomo from "../assets/images/stoneMomo.svg";
+// import stoneAka from "../assets/images/stoneAka.svg";
+// import stoneAomidori from "../assets/images/stoneAomidori.svg";
+// import stoneAsagi from "../assets/images/stoneAsagi.svg";
+// import stoneKi from "../assets/images/stoneKi.svg";
+// import stoneNone from "../assets/images/stoneNone.svg";
 
 const ArticlePage = () => {
   // useNavigateの変数
@@ -57,6 +57,7 @@ const ArticlePage = () => {
   const [itemCategory, setItemCategory] = useState("");
   // 記事削除確認モーダル表示非表示フラッグ
   const [itemDeleteModal, setItemDeleteModal] = useState(false);
+
   // 該当記事取得
   const setMemoItemStoring = async (memoItemId) => {
     if (memoItemId !== "new") {
@@ -64,12 +65,9 @@ const ArticlePage = () => {
       setMemoItemRef(docRef);
       const docSnap = await getDoc(docRef);
       setMemoItem({
-        itemId: docSnap.id,
         text: docSnap.data().text,
         title: docSnap.data().title,
         trigger: docSnap.data().trigger,
-        userId: docSnap.data().userId,
-        date: docSnap.data().date.toDate(),
         categoryId: docSnap.data().categoryId,
       });
     }
@@ -93,11 +91,11 @@ const ArticlePage = () => {
     let categoryListArray = [];
     await getDocs(categoryQuery).then((querySnapshot) => {
       querySnapshot.docs.map((doc, index) => {
-        categoryListArray[index] = {
+        return (categoryListArray[index] = {
           categoryId: doc.id,
           categoryName: doc.data().categoryName,
           categorySortIndex: doc.data().categorySortIndex,
-        };
+        });
       });
     });
     categoryListSort(categoryListArray);
@@ -115,13 +113,17 @@ const ArticlePage = () => {
   };
   // 内容更新
   const memoItemUpdate = async () => {
-    await updateDoc(memoItemRef, {
-      text: itemText,
-      title: itemTitle,
-      trigger: itemTrigger,
-      date: serverTimestamp(),
-      categoryId: itemCategory,
-    });
+    try {
+      await updateDoc(memoItemRef, {
+        text: itemText,
+        title: itemTitle,
+        trigger: itemTrigger,
+        categoryId: itemCategory,
+      });
+      navigate("/memolist/");
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
   };
   // 内容更新
   const memoCreate = async () => {
@@ -166,6 +168,9 @@ const ArticlePage = () => {
   // ログイン監視、メモ・カテゴリー読み込み関数群
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => {
+      if (!currentUser) {
+        navigate("/");
+      }
       setUser(currentUser);
     });
     memoCategoryGetFunc();

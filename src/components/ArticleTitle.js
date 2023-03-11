@@ -32,6 +32,7 @@ const ArticleTitle = ({ text, onChange }) => {
         name="itemTrigger"
         style={flug === true ? styles.input : styles.non}
         value={text}
+        placeholder="40文字以内であれば一覧ページにタイトル全文表示させられます。&#13;なので気持ちの整理ができたときにメモに名前をつけてあげてください。"
         onChange={onChange}
       ></textarea>
     </div>
@@ -95,6 +96,7 @@ const styles = {
     width: "100vw",
     margin: "0 calc(50% - 50vw)",
     display: "block",
-    minHeight: "30vw",
+    minHeight: "42vw",
+    lineHeight: "2em",
   },
 };

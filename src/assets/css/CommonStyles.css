@@ -52,6 +52,11 @@ button::focus {
   outline-offset: -2px;
 }
 
+input::placeholder,
+textarea::placeholder {
+  opacity: 0.3;
+}
+
 img {
   vertical-align: bottom;
   max-width: 100%;

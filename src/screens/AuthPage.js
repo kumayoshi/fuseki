@@ -1,23 +1,27 @@
 import React, { useState, useEffect } from "react";
 // style
-import "./CommonStyles.css";
-import "./CategoryListStyle.css";
-import CommonStyles from "./CommonStyles.css";
+import "../assets/css/CategoryListStyle.css";
+import CommonStyles from "../assets/css/CommonStyles.css";
 // component
 import Header from "../components/Header";
 import Button from "../components/Articlebutton";
 import AccountDeleteModal from "../components/AccountDeleteModal";
-// react-router-dom
+// library
 import { useNavigate } from "react-router-dom";
 // firebase
-import { signOut, onAuthStateChanged, deleteUser } from "firebase/auth";
+import {
+  signOut,
+  onAuthStateChanged,
+  deleteUser,
+  getAuth,
+} from "firebase/auth";
 import { auth, db } from "../firebase";
 import {
+  doc,
   collection,
   getDocs,
   query,
   where,
-  doc,
   deleteDoc,
 } from "firebase/firestore";
 // images
@@ -39,6 +43,7 @@ import stonePurple from "../assets/images/stone_purple.svg";
 import stoneSinku from "../assets/images/stone_sinku.svg";
 import stoneUsuki from "../assets/images/stone_usuki.svg";
 import stoneUsumomo from "../assets/images/stone_usumomo.svg";
+import stoneNone from "../assets/images/stoneNone.svg";
 
 const AuthPage = () => {
   const [iconActive, setIconActive] = useState(false);
@@ -65,8 +70,6 @@ const AuthPage = () => {
 
   // カテゴリを格納する変数
   const [categoryList, setCategoryList] = useState([]);
-  // 各脳されたカテゴリから重複分を削除したものを各脳する変数
-  const [uniqueCategoryList, setUniqueCategoryList] = useState([]);
   // カテゴリの石画像に関する変数
   let categoryStoneStoring;
   const stoneImg = [
@@ -76,14 +79,18 @@ const AuthPage = () => {
     stoneAka,
     stoneNormal,
     stoneAsagi,
+    stoneNone,
   ];
   // mailaddress,passwordを各脳する変数
   const [mailaddress, setMailaddress] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState("");
+  // authと照合したuserlistのdocを格納
+  const [userlistItem, setUserlistItem] = useState("");
   // アカウント削除の確認用モーダルウィンドウフラッグ
   const [accountDeleteModal, setAccountDeleteModal] = useState(false);
-
+  // navigate
+  const navigate = useNavigate();
   // カテゴリ
   // -----------categoryList格納時に画像srcと照合する
   const getCategoryStone = (src) => {
@@ -95,67 +102,68 @@ const AuthPage = () => {
     });
     return categoryStoneStoring;
   };
+  // カテゴリーデータベースの並び替え
+  const categoryListSort = (categoryListArray) => {
+    let categoryListStoring = categoryListArray.sort(function (a, b) {
+      if (a.categorySortIndex > b.categorySortIndex) {
+        return 1;
+      } else {
+        return -1;
+      }
+    });
+    setCategoryList(categoryListStoring);
+  };
   // -----------表示の際にカテゴリの取得
   const getCategory = async () => {
     const todoQuery = query(collection(db, "categoryList"));
     await getDocs(todoQuery).then((querySnapshot) => {
       const categoryListStoring = [];
       querySnapshot.docs.map((doc, index) => {
-        categoryListStoring[index] = {
+        return (categoryListStoring[index] = {
           id: doc.id,
           categoryName: doc.data().categoryName,
           stoneImg: getCategoryStone(doc.data().stoneImg),
-        };
-        // setCategoryList((beforeCategoryList) => [
-        //   ...beforeCategoryList,
-        //   {
-        //     id: doc.id,
-        //     categoryName: doc.data().categoryName,
-        //     stoneImg: getCategoryStone(doc.data().stoneImg),
-        //   },
-        // ]);
+          categorySortIndex: doc.data().categorySortIndex,
+        });
       });
-      setCategoryList(categoryListStoring);
+      categoryListSort(categoryListStoring);
     });
   };
 
   // メールアドレス、パスワード
   const getAccountInformation = async (currentUser) => {
+    const userUid = currentUser.uid;
     const userQuery = query(
       collection(db, "userList"),
-      where("signInUserId", "==", currentUser.uid)
+      where("signInUserId", "in", [userUid])
     );
     await getDocs(userQuery).then((querySnapshot) => {
-      querySnapshot.docs.map((doc) => {
-        setMailaddress(doc.data().mailaddress);
+      let userlistItemStoring = [];
+      querySnapshot.docs.forEach((doc) => {
+        setMailaddress(doc.data().mailadress);
         setPassword(doc.data().password);
+        userlistItemStoring = {
+          id: doc.id,
+        };
       });
+      setUserlistItem(userlistItemStoring);
     });
   };
-
-  // categoryListの重複分の解消
-  // useEffect(() => {
-  //   setUniqueCategoryList(
-  //     Array.from(
-  //       new Map(
-  //         categoryList.map((categoryItem) => [categoryItem.id, categoryItem])
-  //       ).values()
-  //     )
-  //   );
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [categoryList]);
 
   // ログイン監視
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      getAccountInformation(currentUser);
+      if (!currentUser) {
+        navigate("/");
+      } else {
+        setUser(currentUser);
+        getAccountInformation(currentUser);
+      }
     });
     getCategory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // ログアウト
-  const navigate = useNavigate();
   const LogOut = async () => {
     await signOut(auth);
     navigate("/");
@@ -173,48 +181,24 @@ const AuthPage = () => {
   };
   // -----------ユーザ削除
   const accountUserListDelete = async () => {
-    const deleteUserQuery = query(
-      collection(db, "userList"),
-      where("signInUserId", "==", user.uid)
-    );
-    await getDocs(deleteUserQuery).then((querySnapshot) => {
-      querySnapshot.docs.map((doc) => {
-        console.log("ユーザリストから", doc.id, "を削除します。");
-        // deleteDoc(doc(db, "userList", doc.id));
-      });
-    });
-  };
-  // -----------ユーザに関するメモを削除
-  const accountMemoListDelete = async () => {
-    // const batch = db.batch();
-    const deleteMemoListQuery = query(
-      collection(db, "memoList"),
-      where("userId", "==", user.uid)
-    );
-    await getDocs(deleteMemoListQuery).then((querySnapshot) => {
-      querySnapshot.docs.map((doc) => {
-        console.log(
-          "メモリストから",
-          doc.id,
-          doc.data().title,
-          "を削除します。"
-        );
-        // batch.delete(doc.ref);
-      });
-    });
+    deleteDoc(doc(db, "userList", userlistItem.id));
   };
   // -----------ユーザに関するメモを削除
   const accountDelete = () => {
-    // deleteUser(user)
-    //   .then(() => {
-    // userlistから該当するユーザを削除
-    // accountUserListDelete();
-    // memolistから該当するメモを削除
-    accountMemoListDelete();
-    // })
-    // .catch((error) => {
-    //   console.log("error : ", error);
-    // });
+    const auth = getAuth();
+    const willDeleteUser = auth.currentUser;
+    deleteUser(willDeleteUser)
+      .then(() => {
+        // userlistから該当するユーザを削除
+        accountUserListDelete();
+        navigate("/");
+      })
+      .catch((error) => {
+        // 失敗すればアラート
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        alert("errorCode:" + errorCode, "errorMessage:" + errorMessage, "222");
+      });
   };
 
   return (

@@ -32,6 +32,7 @@ const ArticleTrigger = ({ text, onChange }) => {
         name="itemTrigger"
         style={flug === true ? styles.input : styles.non}
         value={text}
+        placeholder="場所、時間、仕事の帰り、朝起きて布団でダラダラしているとき...このメモをあなたに書かせた状況はどんなものでしたか？"
         onChange={onChange}
       ></textarea>
     </div>
@@ -96,5 +97,6 @@ const styles = {
     margin: "0 calc(50% - 50vw)",
     display: "block",
     minHeight: "40vw",
+    lineHeight: "2em",
   },
 };

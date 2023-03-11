@@ -57,11 +57,11 @@ const MemoFilter = ({
             {filterYearText}
           </button>
         </div>
-        <input
+        {/* <input
           style={styles.findText}
           type="text"
           placeholder="キーワードで検索"
-        />
+        /> */}
       </div>
     </div>
   );

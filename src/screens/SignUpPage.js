@@ -1,33 +1,36 @@
 import React, { useState, useEffect } from "react";
-import "./CommonStyles.css";
-import CommonStyles from "./CommonStyles.css";
+// style
+import CommonStyles from "../assets/css/CommonStyles.css";
+// firebase
 import { auth, db } from "../firebase";
-import Header from "../components/Header";
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
 } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
+// library
 import { useNavigate } from "react-router-dom";
-
+// component
+import Header from "../components/Header";
 import SignButton from "../components/SignButton";
 import SignForm from "../components/SignForm";
 
 const SignUpPage = () => {
+  // メールアドレス、パスワード格納用の変数
   const [mail, setMail] = useState("");
   const [pass, setPass] = useState("");
+  // nanigate用の変数
   const navigate = useNavigate();
   // SignUp用の関数
   const signInSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const signUpMail = mail;
       const signUpPass = pass;
       await createUserWithEmailAndPassword(auth, signUpMail, signUpPass);
       setMail("");
       setPass("");
-
+      // 新規登録成功時userlistにユーザを追加
       onAuthStateChanged(auth, (currentUser) => {
         addDoc(collection(db, "userList"), {
           mailadress: signUpMail,
@@ -35,29 +38,34 @@ const SignUpPage = () => {
           signInUserId: currentUser?.uid,
         });
       });
-
+      // userlistにユーザを追加後　オンボーディングページに飛ぶ
       navigate("/onbord/");
     } catch (error) {
+      // 新規登録失敗時にエラー内容をアラートに出す
       const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(
-        "errorCode:" + errorCode,
-        "     errorMessage:" + errorMessage
-      );
-      alert("正しく入力してください");
+      if (errorCode === "auth/user-not-found") {
+        alert(
+          "入力していただいたメールアドレス、パスワードでは該当するユーザがいません。\n一度違うものを試していただけないでしょうか？"
+        );
+      } else if (errorCode === "auth/invalid-email") {
+        alert(
+          "メールアドレスの形式が正しくありません。\n一度見直して再度試していただけませんか？"
+        );
+      }
     }
   };
   // ログイン監視
-  const [user, setUser] = useState("");
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+      if (currentUser) {
+        navigate("/memolist/");
+      }
     });
   }, []);
 
   return (
     <div className={CommonStyles.wrap}>
-      <Header currentPage="新規登録" user={user} />
+      <Header currentPage="新規登録" user={""} />
       <div style={styles.wrap}>
         <SignForm
           mailValue={mail}

@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from "react";
 // style
-import "./CommonStyles.css";
-import CommonStyles from "./CommonStyles.css";
+import CommonStyles from "../assets/css/CommonStyles.css";
 // firebase
 import { auth, db } from "../firebase";
 import {
   // doc,
   collection,
-  // addDoc,
   getDocs,
   query,
   where,
-  // deleteDoc,
-  serverTimestamp,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+// library
+import { useNavigate } from "react-router-dom";
 // component
 import Header from "../components/Header";
 import MemoItem from "../components/MemoItem";
@@ -28,11 +26,11 @@ import stoneAka from "../assets/images/stoneAka.svg";
 import stoneAomidori from "../assets/images/stoneAomidori.svg";
 import stoneAsagi from "../assets/images/stoneAsagi.svg";
 import stoneKi from "../assets/images/stoneKi.svg";
+import stoneNone from "../assets/images/stoneNone.svg";
 
 const SignUpPage = () => {
   // ログインしているユーザ
   const [user, setUser] = useState("");
-
   // category絞り込み時の石の画像保存用変数
   const [filterCategoryImg, setFilterCategoryImg] = useState(stoneShadow);
   // category絞り込み時のID
@@ -49,7 +47,24 @@ const SignUpPage = () => {
   const [memoList, setMemoList] = useState([]);
   // filter後の配列　保存用のステート
   const [memoListChaged, setMemoListChaged] = useState([]);
+  // navigate
+  const navigate = useNavigate();
 
+  // 表示テキスト判別
+  const memoTextCheck = (doc) => {
+    let text = doc.data().title ? doc.data().title : doc.data().text;
+    if (text.length > 40) {
+      text = text.substring(0, 40) + "...";
+    }
+    return text;
+  };
+  // 日付変更
+  const dateFormatCombert = (date) => {
+    const y = date.getFullYear();
+    const m = ("00" + (date.getMonth() + 1)).slice(-2);
+    const d = ("00" + date.getDate()).slice(-2);
+    return `${y}/${m}/${d}`;
+  };
   // メモ一覧の記事データベース
   const memoGetFunc = async (userID) => {
     const memoQuery = query(
@@ -59,15 +74,14 @@ const SignUpPage = () => {
     await getDocs(memoQuery).then((querySnapshot) => {
       const memoStoringArray = [];
       querySnapshot.docs.map((doc, index) => {
-        memoStoringArray[index] = {
+        return (memoStoringArray[index] = {
           itemId: doc.id,
-          text: doc.data().text,
-          title: doc.data().title,
+          text: memoTextCheck(doc),
           trigger: doc.data().trigger,
           userId: doc.data().userId,
-          date: doc.data().date.toDate(),
+          date: dateFormatCombert(doc.data().date.toDate()),
           categoryId: doc.data().categoryId,
-        };
+        });
       });
       setMemoList(memoStoringArray);
       setMemoListChaged(memoStoringArray);
@@ -82,6 +96,7 @@ const SignUpPage = () => {
     stoneAomidori,
     stoneAsagi,
     stoneKi,
+    stoneNone,
   ];
   // 石の画像配列とカテゴリの石のデータベースをcategoryList作成時に参照し格納
   const categoryStoneImgReference = (item) => {
@@ -97,14 +112,17 @@ const SignUpPage = () => {
   // カテゴリー一覧の記事データベース
   const memoCategoryGetFunc = async () => {
     const categoryQuery = query(collection(db, "categoryList"));
+    const categoryListStoring = [];
     await getDocs(categoryQuery).then((querySnapshot) => {
       querySnapshot.docs.map((doc, index) => {
-        categoryList[index] = {
+        return (categoryListStoring[index] = {
           categoryId: doc.id,
-          categoryName: doc.data().categoryName,
+          categoryName:
+            doc.data().categoryName === "-" ? "" : doc.data().categoryName,
           stoneImg: categoryStoneImgReference(doc.data().stoneImg),
-        };
+        });
       });
+      setCategoryList(categoryListStoring);
     });
   };
   // メモ取得の際にカテゴリ配列から該当するカテゴリだけを検索
@@ -200,6 +218,9 @@ const SignUpPage = () => {
   // ログイン監視、メモ・カテゴリー読み込み関数群
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => {
+      if (!currentUser) {
+        navigate("/");
+      }
       setUser(currentUser);
       memoGetFunc(currentUser.uid);
     });
@@ -217,11 +238,11 @@ const SignUpPage = () => {
               const itemCategory = itemCategoryFind(item.categoryId);
               return (
                 <MemoItem
-                  memoText={item.title}
+                  memoText={item.text}
                   stone={itemCategory.stoneImg}
                   categoryText={itemCategory.categoryName}
                   articleId={item.itemId}
-                  // memoDate={item.date}
+                  memoDate={item.date}
                   key={index}
                 />
               );
@@ -263,6 +284,7 @@ const styles = {
   wrap: {
     padding: "0px",
     margin: "25vw auto 0",
+    marginBottom: "28vw",
     width: "79%",
     borderRadius: "10px",
   },

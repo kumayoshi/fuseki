@@ -2,7 +2,7 @@ import React from "react";
 
 const OnbordContent = ({ contentSrc, contentCurrent, contentArrayLength }) => {
   return (
-    <div>
+    <div style={styles.contentWrap}>
       <img src={contentSrc} alt="" />
       {contentCurrent === contentArrayLength && (
         <button style={styles.button}>
@@ -18,6 +18,9 @@ const OnbordContent = ({ contentSrc, contentCurrent, contentArrayLength }) => {
 export default OnbordContent;
 
 const styles = {
+  contentWrap: {
+    height: "66vh",
+  },
   button: {
     margin: "2vw auto 5vw",
     display: "block",
