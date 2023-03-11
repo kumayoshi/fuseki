@@ -102,7 +102,7 @@ const ArticlePage = () => {
   };
   // 読み込み時すでに入力されている項目に入力しておく
   useEffect(() => {
-    setItemTitle(memoItem.title);
+    setItemTitle(memoItem.title !== "無題" ? memoItem.title : "");
     setItemText(memoItem.text);
     setItemTrigger(memoItem.trigger);
     setItemCategory(memoItem.categoryId);
@@ -111,12 +111,12 @@ const ArticlePage = () => {
   const itemCategoryChanged = (item) => {
     setItemCategory(item.target.value);
   };
-  // 内容更新
+  // 既存メモの内容更新
   const memoItemUpdate = async () => {
     try {
       await updateDoc(memoItemRef, {
         text: itemText,
-        title: itemTitle,
+        title: itemTitle ? itemTitle : "無題",
         trigger: itemTrigger,
         categoryId: itemCategory,
       });
@@ -125,12 +125,12 @@ const ArticlePage = () => {
       console.error("Error adding document: ", e);
     }
   };
-  // 内容更新
+  // メモ新規作成
   const memoCreate = async () => {
     try {
       await addDoc(collection(db, "memoList"), {
         text: itemText ? itemText : "",
-        title: itemTitle ? itemTitle : "",
+        title: itemTitle ? itemTitle : "無題",
         trigger: itemTrigger ? itemTrigger : "",
         date: serverTimestamp(),
         categoryId: itemCategory ? itemCategory : "n3TrqVLKqtdVhWxvK59r",

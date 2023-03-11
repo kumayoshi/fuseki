@@ -1,16 +1,26 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const MemoItem = ({ memoText, stone, categoryText, memoDate, articleId }) => {
+const MemoItem = ({
+  memoTitle,
+  memoText,
+  stone,
+  categoryText,
+  memoDate,
+  articleId,
+}) => {
   return (
     <li style={styles.itemWrap}>
       <Link style={styles.itemWrapIn} to={"/article/" + articleId}>
-        <p style={styles.itemTitleWrap}>
+        <div style={styles.itemTitleWrap}>
           <i style={styles.categoryStone}>
             <img src={stone} alt="" />
           </i>
-          <span style={styles.itemTitle}>{memoText}</span>
-        </p>
+          <div>
+            <p style={styles.itemTitle}>{memoTitle}</p>
+            <p style={styles.itemText}>{memoText}</p>
+          </div>
+        </div>
         <div style={styles.infoWrap}>
           <p style={styles.categoryText}>
             {categoryText !== "" ? (
@@ -43,6 +53,10 @@ const styles = {
   itemTitleWrap: {
     display: "flex",
     alignItems: "center",
+  },
+  itemText: {
+    opacity: 0.6,
+    fontSize: "3.3vw",
   },
   itemTitle: {
     fontWeight: "bold",

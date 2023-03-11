@@ -51,10 +51,9 @@ const SignUpPage = () => {
   const navigate = useNavigate();
 
   // 表示テキスト判別
-  const memoTextCheck = (doc) => {
-    let text = doc.data().title ? doc.data().title : doc.data().text;
-    if (text.length > 40) {
-      text = text.substring(0, 40) + "...";
+  const memoTextCheck = (text, maxTextLength) => {
+    if (text.length > maxTextLength) {
+      text = text.substring(0, maxTextLength) + "...";
     }
     return text;
   };
@@ -76,7 +75,8 @@ const SignUpPage = () => {
       querySnapshot.docs.map((doc, index) => {
         return (memoStoringArray[index] = {
           itemId: doc.id,
-          text: memoTextCheck(doc),
+          title: memoTextCheck(doc.data().title, 32),
+          text: memoTextCheck(doc.data().text, 40),
           trigger: doc.data().trigger,
           userId: doc.data().userId,
           date: dateFormatCombert(doc.data().date.toDate()),
@@ -238,6 +238,7 @@ const SignUpPage = () => {
               const itemCategory = itemCategoryFind(item.categoryId);
               return (
                 <MemoItem
+                  memoTitle={item.title}
                   memoText={item.text}
                   stone={itemCategory.stoneImg}
                   categoryText={itemCategory.categoryName}
