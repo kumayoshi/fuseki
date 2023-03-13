@@ -51,7 +51,7 @@ const SignUpPage = () => {
   const navigate = useNavigate();
 
   // 表示テキスト判別
-  const memoTextCheck = (text, maxTextLength) => {
+  const memoTextLengthLimit = (text, maxTextLength) => {
     if (text.length > maxTextLength) {
       text = text.substring(0, maxTextLength) + "...";
     }
@@ -59,32 +59,31 @@ const SignUpPage = () => {
   };
   // 日付変更
   const dateFormatCombert = (date) => {
-    const y = date.getFullYear();
-    const m = ("00" + (date.getMonth() + 1)).slice(-2);
-    const d = ("00" + date.getDate()).slice(-2);
-    return `${y}/${m}/${d}`;
+    const year = date.getFullYear();
+    const month = ("00" + (date.getMonth() + 1)).slice(-2);
+    const day = ("00" + date.getDate()).slice(-2);
+    return `${year}/${month}/${day}`;
   };
   // メモ一覧の記事データベース
-  const memoGetFunc = async (userID) => {
+  const setMemoArray = async (userID) => {
     const memoQuery = query(
       collection(db, "memoList"),
       where("userId", "==", userID)
     );
     await getDocs(memoQuery).then((querySnapshot) => {
-      const memoStoringArray = [];
+      const getMemoArray = [];
       querySnapshot.docs.map((doc, index) => {
-        return (memoStoringArray[index] = {
+        const { title, text, date, categoryId } = doc.data();
+        return (getMemoArray[index] = {
           itemId: doc.id,
-          title: memoTextCheck(doc.data().title, 32),
-          text: memoTextCheck(doc.data().text, 40),
-          trigger: doc.data().trigger,
-          userId: doc.data().userId,
-          date: dateFormatCombert(doc.data().date.toDate()),
-          categoryId: doc.data().categoryId,
+          title: memoTextLengthLimit(title, 32),
+          text: memoTextLengthLimit(text, 40),
+          date: dateFormatCombert(date.toDate()),
+          categoryId: categoryId,
         });
       });
-      setMemoList(memoStoringArray);
-      setMemoListChaged(memoStoringArray);
+      setMemoList(getMemoArray);
+      setMemoListChaged(getMemoArray);
     });
   };
 
@@ -222,7 +221,7 @@ const SignUpPage = () => {
         navigate("/");
       }
       setUser(currentUser);
-      memoGetFunc(currentUser.uid);
+      setMemoArray(currentUser.uid);
     });
     memoCategoryGetFunc();
     // eslint-disable-next-line react-hooks/exhaustive-deps
