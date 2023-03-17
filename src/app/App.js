@@ -5,6 +5,8 @@ import MemoListPage from "../screens/MemoListPage";
 import AuthPage from "../screens/AuthPage";
 import ArticlePage from "../screens/ArticlePage";
 import OnBord from "../screens/OnBord";
+import PasswordReset from "../screens/PasswordReset";
+import SetNewPassword from "../screens/SetNewPassword";
 
 function App() {
   return (
@@ -16,6 +18,14 @@ function App() {
         <Route path={"/auth/"} element={<AuthPage></AuthPage>} />
         <Route path={"/article/:id"} element={<ArticlePage></ArticlePage>} />
         <Route path={"/onbord/"} element={<OnBord></OnBord>} />
+        <Route
+          path={"/passwordreset/"}
+          element={<PasswordReset></PasswordReset>}
+        />
+        <Route
+          path={"/set-new-password/"}
+          element={<SetNewPassword></SetNewPassword>}
+        />
       </Routes>
     </BrowserRouter>
   );

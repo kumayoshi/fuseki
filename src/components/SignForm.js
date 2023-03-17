@@ -1,40 +1,51 @@
 import React from "react";
 
-const SignForm = ({ mailValue, onMailChange, passValue, onPassChange }) => {
+const SignForm = ({
+  onMailChange,
+  onPassChange,
+  passExistence,
+  mailExistence,
+  mailChangeExistence,
+}) => {
   return (
     <div>
-      <div>
-        <label>
-          <p style={styles.labelText}>メールアドレス</p>
-          <input
-            type="email"
-            placeholder="メールアドレス"
-            // value={mailValue}
-            onChange={(e) => onMailChange(e.target.value)}
-            style={styles.inputText}
-          />
-        </label>
-      </div>
+      {mailExistence === "none" || (
+        <div>
+          <label>
+            <p style={styles.labelText}>メールアドレス</p>
+            <input
+              type="email"
+              placeholder="mail@example.com"
+              onChange={(e) => onMailChange(e.target.value)}
+              style={styles.inputText}
+            />
+          </label>
+        </div>
+      )}
 
-      <div style={styles.passwordBlock}>
-        <label>
-          <p style={styles.labelText}>パスワード</p>
-          <input
-            type="password"
-            placeholder="パスワード (6文字以上)"
-            // value={passValue}
-            onChange={(e) => onPassChange(e.target.value)}
-            style={styles.inputText}
-          />
-        </label>
-        <p style={styles.passwordAttentionText}>
-          パスワードをお忘れの方は
-          <a className={"text_link"} href="">
-            こちら
-          </a>
-          から変更をお願いします。
-        </p>
-      </div>
+      {passExistence === "none" || (
+        <div style={styles.passwordBlock}>
+          <label>
+            <p style={styles.labelText}>パスワード</p>
+            <input
+              type="password"
+              placeholder="パスワード (6文字以上)"
+              // value={passValue}
+              onChange={(e) => onPassChange(e.target.value)}
+              style={styles.inputText}
+            />
+          </label>
+          {mailChangeExistence === "none" || (
+            <p style={styles.passwordAttentionText}>
+              パスワードをお忘れの方は
+              <a className={"text_link"} href={"/passwordreset/"}>
+                こちら
+              </a>
+              から変更をお願いします。
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
@@ -43,7 +54,7 @@ export default SignForm;
 
 const styles = {
   labelText: {
-    color: "rgba(67,67,67,0.4)",
+    color: "rgba(67,67,67,1)",
     fontSize: "3vw",
   },
   passwordBlock: {
