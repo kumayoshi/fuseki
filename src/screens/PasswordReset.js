@@ -1,78 +1,86 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+// style
+import CommonStyles from "../assets/css/CommonStyles.css";
+// firebase
+import { auth } from "../firebase";
+// import firebase from "firebase";
+import { sendPasswordResetEmail } from "firebase/auth";
+// library
+import { useNavigate } from "react-router-dom";
+// component
 import Header from "../components/Header";
 import SignButton from "../components/SignButton";
 import SignForm from "../components/SignForm";
-// firebase
-import { auth } from "../firebase";
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-// library
-import { useNavigate } from "react-router-dom";
-// style
-import CommonStyles from "../assets/css/CommonStyles.css";
+import PasswordResetValidate from "../components/PasswordResetValidate";
 
-const SignInPage = () => {
+const PasswordReset = () => {
+  // navigate
+  const navigate = useNavigate();
   // メールアドレス、パスワード格納用の変数
   const [mail, setMail] = useState("");
-  const [pass, setPass] = useState("");
-  // nanigate用の変数
-  const navigate = useNavigate();
+  // メール送信成功時のフラッグ
+  const [success, setSuccess] = useState(false);
+  // メール送信失敗時のエラー内容格納
+  const [error, setError] = useState("");
 
-  // SignIn用の関数
-  const signInSubmit = async (e) => {
-    e.preventDefault();
-    const signUpMail = mail;
-    const signUpPass = pass;
-    // メールアドレス、パスワードとfirebase authの照合
-    await signInWithEmailAndPassword(auth, signUpMail, signUpPass)
-      .then((userCredential) => {
-        // 成功すればメモ一覧ページへ
-        navigate("/memolist/");
+  // パスワード変更用のurlをメールアドレスに送る
+  const passwordResetMailSend = async () => {
+    await sendPasswordResetEmail(auth, mail)
+      .then(() => {
+        setSuccess(true);
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
       })
-      .catch((error) => {
-        // 失敗すればアラート
-        const errorCode = error.code;
-        if (errorCode === "auth/user-not-found") {
-          alert(
-            "入力していただいたメールアドレス、パスワードでは該当するユーザがいません。\n一度違うものを試してみてください。"
+      .catch((err) => {
+        const errorMessage = err.message;
+        if (errorMessage.indexOf("user-not-found") !== -1) {
+          setError(
+            "入力していただいたメールアドレスは登録されているものと違うみたいです..."
           );
-        } else if (errorCode === "auth/invalid-email") {
-          alert(
-            "メールアドレスの形式が正しくありません。\n一度見直して再度試していただけませんか？"
+        } else if (errorMessage.indexOf("invalid") !== -1) {
+          setError(
+            "メールアドレスの形式が正しくないようです。@が抜けているとか...？"
           );
         }
       });
   };
-  // ログイン監視
-  useEffect(() => {
-    onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        navigate("/memolist/");
-      }
-    });
-  }, []);
 
   return (
     <div className={CommonStyles.wrap}>
-      <Header currentPage="ログイン" user={""} />
+      <Header currentPage="パスワード再設定" user={""} />
       <div style={styles.wrap}>
         <div>
+          <h2 style={styles.pageTitle}>
+            パスワードを再設定するためのurlを送ります。
+            <br />
+            登録されたメールアドレスを入力してください。
+          </h2>
+          {success && (
+            <PasswordResetValidate
+              judge="success"
+              successMessage="パスワード変更のためのurlをメールアドレスに送信させていただきました。メールをご確認ください。"
+            />
+          )}
+          {error !== "" && success === false && (
+            <PasswordResetValidate judge="error" errorMessage={error} />
+          )}
+        </div>
+        <div>
           <SignForm
-            // mailValue={mail}
             onMailChange={(text) => setMail(text)}
-            // passValue={pass}
-            onPassChange={(text) => setPass(text)}
+            passExistence="none"
           />
 
           <SignButton
-            onClick={(e) => signInSubmit(e)}
-            label="ログイン"
-            style={styles.submitButton}
+            onClick={() => passwordResetMailSend()}
+            label="メールを送る"
+            style={styles.submitButtonWide}
           />
         </div>
-
         <p style={styles.signUptext}>
-          <a style={styles.signUpLink} href={"/signup/"}>
-            ご登録がまだの方
+          <a style={styles.signUpLink} href={"/"}>
+            ログインに戻る
           </a>
         </p>
       </div>
@@ -80,7 +88,7 @@ const SignInPage = () => {
   );
 };
 
-export default SignInPage;
+export default PasswordReset;
 
 const styles = {
   base: {
@@ -110,5 +118,24 @@ const styles = {
   },
   signUpLink: {
     color: "#579DDD",
+  },
+  submitButtonWide: {
+    width: "66vw",
+    margin: "11vw auto 0px",
+    display: "block",
+    padding: "3vw 0",
+    boxSizing: "border-box",
+    textAlign: "center",
+    fontSize: "5vw",
+    fontWeight: "bold",
+    border: "2px solid #5bcbcb",
+    color: "#5bcbcb",
+    borderRadius: "8px",
+    background: "#fff",
+  },
+  pageTitle: {
+    fontSize: "3.5vw",
+    textAlign: "center",
+    marginBottom: "8vw",
   },
 };
