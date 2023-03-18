@@ -6,6 +6,7 @@ import CommonStyles from "../assets/css/CommonStyles.css";
 import Header from "../components/Header";
 import Button from "../components/Articlebutton";
 import AccountDeleteModal from "../components/AccountDeleteModal";
+import UserInformationChengeModal from "../components/UserInformationChengeModal";
 // library
 import { useNavigate } from "react-router-dom";
 // firebase
@@ -14,10 +15,15 @@ import {
   onAuthStateChanged,
   deleteUser,
   getAuth,
+  updateEmail,
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
 } from "firebase/auth";
 import { auth, db } from "../firebase";
 import {
   doc,
+  updateDoc,
   collection,
   getDocs,
   query,
@@ -28,45 +34,13 @@ import {
 import stoneNormal from "../assets/images/stoneNormal.svg";
 import stoneMomo from "../assets/images/stoneMomo.svg";
 import stoneAka from "../assets/images/stoneAka.svg";
-import stoneAkacha from "../assets/images/stone_akacha.svg";
-import stoneAkaki from "../assets/images/stone_akaki.svg";
-import stoneAo from "../assets/images/stone_ao.svg";
 import stoneAomidori from "../assets/images/stoneAomidori.svg";
 import stoneAsagi from "../assets/images/stoneAsagi.svg";
-import stoneCha from "../assets/images/stone_cha.svg";
 import stoneKi from "../assets/images/stoneKi.svg";
-import stoneKimidori from "../assets/images/stone_kimidori.svg";
-import stoneKoke from "../assets/images/stone_koke.svg";
-import stoneOrange from "../assets/images/stone_orange.svg";
-import stoneOre from "../assets/images/stone_ore.svg";
-import stonePurple from "../assets/images/stone_purple.svg";
-import stoneSinku from "../assets/images/stone_sinku.svg";
-import stoneUsuki from "../assets/images/stone_usuki.svg";
-import stoneUsumomo from "../assets/images/stone_usumomo.svg";
 import stoneNone from "../assets/images/stoneNone.svg";
 
 const AuthPage = () => {
   const [iconActive, setIconActive] = useState(false);
-
-  // const stoneImgs = [
-  //   Stone,
-  //   StoneMomo,
-  //   StoneAka,
-  //   StoneAkacha,
-  //   StoneAkaki,
-  //   StoneAo,
-  //   StoneAomidori,
-  //   StoneAsagi,
-  //   StoneCha,
-  //   StoneKimidori,
-  //   StoneKoke,
-  //   StoneOrange,
-  //   StoneOre,
-  //   StonePurple,
-  //   StoneSinku,
-  //   StoneUsuki,
-  //   StoneUsumomo,
-  // ];
 
   // カテゴリを格納する変数
   const [categoryList, setCategoryList] = useState([]);
@@ -81,7 +55,7 @@ const AuthPage = () => {
     stoneAsagi,
     stoneNone,
   ];
-  // mailaddress,passwordを各脳する変数
+  // mailaddress,passwordを格納する変数
   const [mailaddress, setMailaddress] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState("");
@@ -89,6 +63,14 @@ const AuthPage = () => {
   const [userlistItem, setUserlistItem] = useState("");
   // アカウント削除の確認用モーダルウィンドウフラッグ
   const [accountDeleteModal, setAccountDeleteModal] = useState(false);
+  // アカウント情報を変更した際にmailaddress,passwordを格納する変数
+  const [newMailaddress, setNewMailaddress] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  // アカウント情報のモーダルのテキスト
+  const [discriptionText, setDiscriptionText] = useState("");
+  // アカウント情報のモーダル表示フラッグ
+  const [informationUpdateModalType, setInformationUpdateModalType] =
+    useState("none");
   // navigate
   const navigate = useNavigate();
   // カテゴリ
@@ -201,6 +183,72 @@ const AuthPage = () => {
       });
   };
 
+  // アカウント情報変更
+  // -----------モーダルウィンドウ内の「戻る」を押した際の処理
+  useEffect(() => {
+    if (informationUpdateModalType === "mail") {
+      setDiscriptionText(
+        "メールアドレスの変更をします。\n新しいメールアドレスを入力してください。"
+      );
+    } else if (informationUpdateModalType === "password") {
+      setDiscriptionText(
+        "パスワードの変更をします。\n新しいパスワードを入力してください。"
+      );
+    }
+  }, [informationUpdateModalType]);
+  // -----------モーダルウィンドウ内の「戻る」を押した際の処理
+  const informationUpdateSwitchCancel = () => {
+    setInformationUpdateModalType("none");
+  };
+  // -----------パスワード変更
+  const onPasswordChange = () => {
+    const updateUser = getAuth().currentUser;
+    const credential = EmailAuthProvider.credential(mailaddress, password);
+    reauthenticateWithCredential(updateUser, credential)
+      .then(() => {
+        updatePassword(updateUser, newPassword)
+          .then(() => {
+            const reference = doc(db, "userList", userlistItem.id);
+            updateDoc(reference, {
+              password: newPassword,
+            });
+            setInformationUpdateModalType("none");
+          })
+          .catch((error) => {
+            console.log(error.message);
+          });
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
+  // -----------メールアドレス変更
+  const onEmailAddressChange = () => {
+    const updateUser = getAuth().currentUser;
+    const credential = EmailAuthProvider.credential(mailaddress, password);
+    reauthenticateWithCredential(updateUser, credential).then(() => {
+      updateEmail(updateUser, newMailaddress)
+        .then(() => {
+          const reference = doc(db, "userList", userlistItem.id);
+          updateDoc(reference, {
+            mailadress: newMailaddress,
+          });
+          setInformationUpdateModalType("none");
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
+    });
+  };
+  // -----------アカウント情報偏光ボタンをクリックした際の処理
+  const updateInfomation = () => {
+    if (informationUpdateModalType === "mail") {
+      onEmailAddressChange();
+    } else if (informationUpdateModalType === "password") {
+      onPasswordChange();
+    }
+  };
+
   return (
     <div className={CommonStyles.wrap}>
       <Header currentPage="アカウントの設定" user={user} />
@@ -214,7 +262,12 @@ const AuthPage = () => {
               style={styles.itemContent}
               readOnly
             />
-            {/* <p style={styles.itemAttention}><a href={}>メールアドレスの変更</a></p> */}
+            <p
+              onClick={() => setInformationUpdateModalType("mail")}
+              style={styles.itemAttention}
+            >
+              メールアドレスの変更
+            </p>
           </div>
           <div style={styles.bottomBlock}>
             <h2 style={styles.itemTitle}>パスワード</h2>
@@ -224,7 +277,12 @@ const AuthPage = () => {
               style={styles.itemContent}
               readOnly
             />
-            {/* <p style={styles.itemAttention}><a href={}>パスワードの変更</a></p> */}
+            <p
+              onClick={() => setInformationUpdateModalType("password")}
+              style={styles.itemAttention}
+            >
+              パスワードの変更
+            </p>
           </div>
           <div style={styles.bottomBlock}>
             <h2 style={styles.itemTitle}>カテゴリ</h2>
@@ -247,37 +305,6 @@ const AuthPage = () => {
             </ul>
           </div>
 
-          {/* <li className={"categorylistItem"} key={index}>
-            <p className={"categorylistItemText"}>
-              {CategoryItem.categoryName}
-            </p>
-            <i
-              onClick={() => setIconActive(!iconActive)}
-              className={
-                iconActive
-                  ? "categorylistItemIcon active"
-                  : "categorylistItemIcon"
-              }
-            >
-              <img src={CategoryItem.stoneImg} alt="" />
-            </i>
-          </li> */}
-          {/* <div
-            className={
-              iconActive
-                ? "categorylistItemModal active"
-                : "categorylistItemModal none"
-            }
-          >
-            <ul>
-              {stoneImgs.map((stoneImg, index) => (
-                <li key={index}>
-                  <img src={stoneImg} alt="" />
-                </li>
-              ))}
-            </ul>
-          </div> */}
-
           <Button
             onClick={() => LogOut()}
             text={"ログアウト"}
@@ -296,6 +323,15 @@ const AuthPage = () => {
         modalFlug={accountDeleteModal}
         cancel={() => accountDeleteModalCancel()}
         accountDelete={() => accountDelete()}
+      />
+
+      <UserInformationChengeModal
+        modalFlug={informationUpdateModalType}
+        onMailChange={(text) => setNewMailaddress(text)}
+        onPassChange={(text) => setNewPassword(text)}
+        desciptionText={discriptionText}
+        cancel={() => informationUpdateSwitchCancel()}
+        updateInfomation={() => updateInfomation()}
       />
     </div>
   );

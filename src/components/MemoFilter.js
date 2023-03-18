@@ -14,10 +14,6 @@ const MemoFilter = ({
   filterMonthChanged,
   filterClose,
 }) => {
-  // number === 3 && console.log("&&の2です");
-  // number === 3 || console.log("||の3以外です");
-  // console.log(number === 2);
-
   return (
     // 絞り込みウィンドウ　全体
     <div style={styles.findWrap}>
