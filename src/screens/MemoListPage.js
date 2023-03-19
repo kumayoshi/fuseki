@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import MemoItem from "../components/MemoItem";
 import MemoFilter from "../components/MemoFilter";
+import { memoTextLengthLimit } from "../util/util";
 // images
 import stoneShadow from "../assets/images/stone_shadow.svg";
 import newArticle from "../assets/images/newMemo.svg";
@@ -50,13 +51,13 @@ const SignUpPage = () => {
   // navigate
   const navigate = useNavigate();
 
-  // 表示テキスト判別
-  const memoTextLengthLimit = (text, maxTextLength) => {
-    if (text.length > maxTextLength) {
-      text = text.substring(0, maxTextLength) + "...";
-    }
-    return text;
-  };
+  // // 表示テキスト判別
+  // const memoTextLengthLimit = (text, maxTextLength) => {
+  //   if (text.length > maxTextLength) {
+  //     text = text.substring(0, maxTextLength) + "...";
+  //   }
+  //   return text;
+  // };
   // 日付変更
   const dateFormatCombert = (date) => {
     const year = date.getFullYear();
