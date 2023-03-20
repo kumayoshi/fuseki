@@ -17,17 +17,16 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import MemoItem from "../components/MemoItem";
 import MemoFilter from "../components/MemoFilter";
-import { memoTextLengthLimit } from "../util/util";
-// images
-import stoneShadow from "../assets/images/stone_shadow.svg";
+import {
+  memoTextLengthLimit,
+  dateFormatCombert,
+  categoryStoneImgReference,
+  itemCategoryFind,
+} from "../utils/MemoProcess";
+// 新しい記事追加ボタンの
 import newArticle from "../assets/images/newMemo.svg";
-import stoneNormal from "../assets/images/stoneNormal.svg";
-import stoneMomo from "../assets/images/stoneMomo.svg";
-import stoneAka from "../assets/images/stoneAka.svg";
-import stoneAomidori from "../assets/images/stoneAomidori.svg";
-import stoneAsagi from "../assets/images/stoneAsagi.svg";
-import stoneKi from "../assets/images/stoneKi.svg";
-import stoneNone from "../assets/images/stoneNone.svg";
+// カテゴリ絞り込みの初期画像
+import stoneShadow from "../assets/images/stone_shadow.svg";
 
 const SignUpPage = () => {
   // ログインしているユーザ
@@ -40,6 +39,8 @@ const SignUpPage = () => {
   const [filterYearText, setFilterYearText] = useState("年/月");
   // 日付絞り込み時の日付保存用変数
   const [filterYearLabel, setFilterYearLabel] = useState("-");
+  // 日付絞り込み時の日付保存用変数
+  const [filterYearArray, setFilterYearArray] = useState([]);
   // categoryListを一旦宣言する
   const [categoryList, setCategoryList] = useState([]);
   // 絞り込みモーダルのタイプ
@@ -51,20 +52,6 @@ const SignUpPage = () => {
   // navigate
   const navigate = useNavigate();
 
-  // // 表示テキスト判別
-  // const memoTextLengthLimit = (text, maxTextLength) => {
-  //   if (text.length > maxTextLength) {
-  //     text = text.substring(0, maxTextLength) + "...";
-  //   }
-  //   return text;
-  // };
-  // 日付変更
-  const dateFormatCombert = (date) => {
-    const year = date.getFullYear();
-    const month = ("00" + (date.getMonth() + 1)).slice(-2);
-    const day = ("00" + date.getDate()).slice(-2);
-    return `${year}/${month}/${day}`;
-  };
   // メモ一覧の記事データベース
   const setMemoArray = async (userID) => {
     const memoQuery = query(
@@ -87,49 +74,21 @@ const SignUpPage = () => {
       setMemoListChaged(getMemoArray);
     });
   };
-
-  // 画像の変数を配列に格納
-  const categoryStoneArray = [
-    stoneNormal,
-    stoneMomo,
-    stoneAka,
-    stoneAomidori,
-    stoneAsagi,
-    stoneKi,
-    stoneNone,
-  ];
-  // 石の画像配列とカテゴリの石のデータベースをcategoryList作成時に参照し格納
-  const categoryStoneImgReference = (item) => {
-    let stoneImg;
-    categoryStoneArray.forEach((stoneItem) => {
-      const stoneArraydetermining = stoneItem.indexOf(item);
-      if (stoneArraydetermining !== -1) {
-        stoneImg = stoneItem;
-      }
-    });
-    return stoneImg;
-  };
   // カテゴリー一覧の記事データベース
   const memoCategoryGetFunc = async () => {
     const categoryQuery = query(collection(db, "categoryList"));
     const categoryListStoring = [];
     await getDocs(categoryQuery).then((querySnapshot) => {
       querySnapshot.docs.map((doc, index) => {
+        const { categoryName, stoneImg } = doc.data();
         return (categoryListStoring[index] = {
           categoryId: doc.id,
-          categoryName:
-            doc.data().categoryName === "-" ? "" : doc.data().categoryName,
-          stoneImg: categoryStoneImgReference(doc.data().stoneImg),
+          categoryName: categoryName === "-" ? "" : categoryName,
+          stoneImg: categoryStoneImgReference(stoneImg),
         });
       });
       setCategoryList(categoryListStoring);
     });
-  };
-  // メモ取得の際にカテゴリ配列から該当するカテゴリだけを検索
-  const itemCategoryFind = (itemCategoryID) => {
-    return categoryList.find(
-      (cateitem) => cateitem.categoryId === itemCategoryID
-    );
   };
   // 絞り込みモーダルの表示切り替え
   const modalTypeChanged = (type) => {
@@ -215,6 +174,20 @@ const SignUpPage = () => {
     }
   };
 
+  // -----ユーザリストから日付データを取得
+  const getDateFilter = async (userId) => {
+    const userQuery = query(
+      collection(db, "userList"),
+      where("signInUserId", "in", [userId])
+    );
+    await getDocs(userQuery).then((querySnapshot) => {
+      querySnapshot.docs.forEach((doc) => {
+        const { filterDate } = doc.data();
+        setFilterYearArray(filterDate);
+      });
+    });
+  };
+
   // ログイン監視、メモ・カテゴリー読み込み関数群
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => {
@@ -223,6 +196,7 @@ const SignUpPage = () => {
       }
       setUser(currentUser);
       setMemoArray(currentUser.uid);
+      getDateFilter(currentUser.uid);
     });
     memoCategoryGetFunc();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -235,7 +209,10 @@ const SignUpPage = () => {
         <ul>
           {memoListChaged &&
             memoListChaged.map((item, index) => {
-              const itemCategory = itemCategoryFind(item.categoryId);
+              const itemCategory = itemCategoryFind(
+                item.categoryId,
+                categoryList
+              );
               return (
                 <MemoItem
                   memoTitle={item.title}
@@ -258,6 +235,7 @@ const SignUpPage = () => {
           categoryList={categoryList}
           filterCategoryImg={filterCategoryImg}
           filterCategoryChanged={(item) => filterCategoryChanged(item)}
+          filterYearArray={filterYearArray}
           filterYearText={filterYearText}
           filterYearLabel={filterYearLabel}
           filterYearChanged={(label) => filterYearChanged(label)}
