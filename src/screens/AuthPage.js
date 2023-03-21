@@ -212,6 +212,7 @@ const AuthPage = () => {
             updateDoc(reference, {
               password: newPassword,
             });
+            setPassword(newPassword);
             setInformationUpdateModalType("none");
           })
           .catch((error) => {
@@ -233,6 +234,7 @@ const AuthPage = () => {
           updateDoc(reference, {
             mailadress: newMailaddress,
           });
+          setMailaddress(newMailaddress);
           setInformationUpdateModalType("none");
         })
         .catch((error) => {
