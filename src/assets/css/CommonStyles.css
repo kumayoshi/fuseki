@@ -1,6 +1,6 @@
 body,
 .wrap {
-  background-color: #fafafa;
+  background-color: #f8f8f8;
   color: #434343;
   margin: 0;
   padding: 0;
@@ -23,14 +23,16 @@ li {
 }
 
 input,
-textarea {
+textarea,
+button {
   border: none;
   background-color: none;
   -webkit-appearance: none;
 }
 
 input[type="submit"],
-input[type="button"] {
+input[type="button"],
+button {
   border-radius: 0;
   -webkit-box-sizing: content-box;
   -webkit-appearance: button;
@@ -40,12 +42,19 @@ input[type="button"] {
   cursor: pointer;
 }
 input[type="submit"]::-webkit-search-decoration,
-input[type="button"]::-webkit-search-decoration {
+input[type="button"]::-webkit-search-decoration,
+button::-webkit-search-decoration {
   display: none;
 }
 input[type="submit"]::focus,
-input[type="button"]::focus {
+input[type="button"]::focus,
+button::focus {
   outline-offset: -2px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  opacity: 0.3;
 }
 
 img {

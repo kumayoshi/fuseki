@@ -3,11 +3,11 @@ import Logo from "../assets/images/logo.png";
 import AuthIcon from "../assets/images/auth_icon.svg";
 
 const Header = ({ currentPage, user }) => {
-  if (user !== "") {
+  if (user) {
     return (
       <header>
         <figure>
-          <a href={"/todoList/"}>
+          <a href={"/memolist/"}>
             <img src={Logo} alt="ロゴ" />
           </a>
         </figure>
