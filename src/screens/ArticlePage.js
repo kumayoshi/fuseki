@@ -64,11 +64,13 @@ const ArticlePage = () => {
       const docRef = doc(db, "memoList", memoItemId);
       setMemoItemRef(docRef);
       const docSnap = await getDoc(docRef);
+      const { text, title, trigger, categoryId } = docSnap.data();
       setMemoItem({
-        text: docSnap.data().text,
-        title: docSnap.data().title,
-        trigger: docSnap.data().trigger,
-        categoryId: docSnap.data().categoryId,
+        itemId: docSnap.id,
+        text: text,
+        title: title,
+        trigger: trigger,
+        categoryId: categoryId,
       });
     }
     setMemoParams(memoItemId);
