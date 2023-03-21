@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 // style
 import CommonStyles from "../assets/css/CommonStyles.css";
+import "../assets/css/CommonStyles.css";
 // firebase
 import Header from "../components/Header";
 import { auth, db } from "../firebase";
@@ -67,10 +68,10 @@ const ArticlePage = () => {
       const { text, title, trigger, categoryId } = docSnap.data();
       setMemoItem({
         itemId: docSnap.id,
-        text: text,
-        title: title,
-        trigger: trigger,
-        categoryId: categoryId,
+        text: text ? text : "",
+        title: title ? title : "",
+        trigger: trigger ? trigger : "",
+        categoryId: categoryId ? categoryId : "",
       });
     }
     setMemoParams(memoItemId);
