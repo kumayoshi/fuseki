@@ -28,13 +28,14 @@ import ArticleDeleteComfirm from "../components/ArticleDeleteComfirm";
 import { useParams, useNavigate } from "react-router-dom";
 // images
 import backArrow from "../assets/images/backArrow.svg";
-// import stoneNormal from "../assets/images/stoneNormal.svg";
-// import stoneMomo from "../assets/images/stoneMomo.svg";
-// import stoneAka from "../assets/images/stoneAka.svg";
-// import stoneAomidori from "../assets/images/stoneAomidori.svg";
-// import stoneAsagi from "../assets/images/stoneAsagi.svg";
-// import stoneKi from "../assets/images/stoneKi.svg";
-// import stoneNone from "../assets/images/stoneNone.svg";
+// カテゴリの石の画像
+import stoneNormal from "../assets/images/stoneNormal.svg";
+import stoneMomo from "../assets/images/stoneMomo.svg";
+import stoneAka from "../assets/images/stoneAka.svg";
+import stoneAomidori from "../assets/images/stoneAomidori.svg";
+import stoneAsagi from "../assets/images/stoneAsagi.svg";
+import stoneKi from "../assets/images/stoneKi.svg";
+import stoneNone from "../assets/images/stoneNone.svg";
 
 const ArticlePage = () => {
   // useNavigateの変数
@@ -58,6 +59,17 @@ const ArticlePage = () => {
   const [itemCategory, setItemCategory] = useState("");
   // 記事削除確認モーダル表示非表示フラッグ
   const [itemDeleteModal, setItemDeleteModal] = useState(false);
+  // カテゴリ　石の画像ソース
+  let categoryStoneStoring;
+  const stoneImg = [
+    stoneMomo,
+    stoneKi,
+    stoneAomidori,
+    stoneAka,
+    stoneNormal,
+    stoneAsagi,
+    stoneNone,
+  ];
 
   // 該当記事取得
   const setMemoItemStoring = async (memoItemId) => {
@@ -77,6 +89,16 @@ const ArticlePage = () => {
     setMemoParams(memoItemId);
   };
 
+  // -----------categoryList格納時に画像srcと照合する
+  const getCategoryStone = (src) => {
+    stoneImg.forEach((item) => {
+      if (item.indexOf(src) !== -1) {
+        categoryStoneStoring = item;
+        return true;
+      }
+    });
+    return categoryStoneStoring;
+  };
   // カテゴリーデータベースの並び替え
   const categoryListSort = (categoryListArray) => {
     let categoryListStoring = categoryListArray.sort(function (a, b) {
@@ -94,10 +116,12 @@ const ArticlePage = () => {
     let categoryListArray = [];
     await getDocs(categoryQuery).then((querySnapshot) => {
       querySnapshot.docs.map((doc, index) => {
+        const { categoryName, stoneImg, categorySortIndex } = doc.data();
         return (categoryListArray[index] = {
           categoryId: doc.id,
-          categoryName: doc.data().categoryName,
-          categorySortIndex: doc.data().categorySortIndex,
+          categoryName: categoryName,
+          stoneImg: getCategoryStone(stoneImg),
+          categorySortIndex: categorySortIndex,
         });
       });
     });

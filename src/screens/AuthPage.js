@@ -101,11 +101,12 @@ const AuthPage = () => {
     await getDocs(todoQuery).then((querySnapshot) => {
       const categoryListStoring = [];
       querySnapshot.docs.map((doc, index) => {
+        const { categoryName, stoneImg, categorySortIndex } = doc.data();
         return (categoryListStoring[index] = {
           id: doc.id,
-          categoryName: doc.data().categoryName,
-          stoneImg: getCategoryStone(doc.data().stoneImg),
-          categorySortIndex: doc.data().categorySortIndex,
+          categoryName: categoryName,
+          stoneImg: getCategoryStone(stoneImg),
+          categorySortIndex: categorySortIndex,
         });
       });
       categoryListSort(categoryListStoring);
