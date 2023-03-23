@@ -140,18 +140,39 @@ const SignUpPage = () => {
 
   // 年、月で絞り込み関数
   const filterDateAble = (label) => {
-    let filterMemoList = memoList.filter(
-      (memoListItem) => memoListItem.date.indexOf(label) !== -1
-    );
-    // カテゴリがすでに絞り込まれている場合カテゴリidで絞り込む
-    if (!isNaN(filterCategoryId)) {
-      filterMemoList = filterMemoList.filter(
-        (memoListItem) => memoListItem.categoryId === filterCategoryId
+    if (label === "-") {
+      setFilterYearText("");
+      if (filterCategoryImg.indexOf("stone_shadow") === -1) {
+        const filterMemoList = memoList.filter(
+          (memoListItem) => memoListItem.categoryId === filterCategoryId
+        );
+        setMemoListChaged(filterMemoList);
+      } else {
+        setMemoListChaged(memoList);
+      }
+    } else if (label !== "-") {
+      if (label.indexOf("-")) {
+        label = label !== "-" ? label : "";
+        label = label.replace("-", "");
+      }
+      let filterMemoList = memoList.filter(
+        (memoListItem) => memoListItem.date.indexOf(label) !== -1
       );
+      console.log(filterMemoList);
+      if (filterCategoryImg.indexOf("stone_shadow") === -1) {
+        console.log(filterCategoryId);
+        filterMemoList = filterMemoList.filter(
+          (memoListItem) => memoListItem.categoryId === filterCategoryId
+        );
+      }
+      setFilterYearText(label);
+      setMemoListChaged(filterMemoList);
     }
-    setFilterYearText(label);
-    setMemoListChaged(filterMemoList);
   };
+
+  useEffect(() => {
+    console.log(memoListChaged);
+  }, [memoListChaged]);
 
   // -----年を選択した際
   const filterYearChanged = (item) => {

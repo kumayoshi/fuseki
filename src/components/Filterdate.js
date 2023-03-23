@@ -68,6 +68,7 @@ const FilterDate = ({
               onChange={(label) => filterYearChanged(label)}
             >
               <option value="-">-</option>
+              <option value="2022">2022</option>
               <option value="2023">2023</option>
             </select>
           </label>
@@ -89,7 +90,7 @@ const FilterDate = ({
               }
             >
               <option value="-">-</option>
-              <option value="3">3</option>
+              <option value="03">03</option>
             </select>
           </label>
         </div>
