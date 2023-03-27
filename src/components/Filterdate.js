@@ -12,6 +12,9 @@ const FilterDate = ({
   filterYearLabel,
   filterMonthChanged,
   filterClose,
+  filterYearArray,
+  filterYear,
+  filterMonth,
 }) => {
   if (modalType === "category") {
     return (
@@ -66,6 +69,7 @@ const FilterDate = ({
               name="filteryear"
               style={styles.findModalDateItemSelect}
               onChange={(label) => filterYearChanged(label)}
+              defaultValue={filterYear}
             >
               <option value="-">-</option>
               <option value="2022">2022</option>
@@ -83,6 +87,7 @@ const FilterDate = ({
           >
             <span style={styles.findModalDateItemText}>月</span>
             <select
+              defaultValue={filterMonth}
               style={
                 filterYearLabel !== "-"
                   ? styles.findModalDateItemSelect
