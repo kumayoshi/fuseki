@@ -44,6 +44,7 @@ const styles = {
     minHeight: "80vw",
     lineHeight: "2em",
     letterSpacing: "0.1em",
+    fontSize: "4vw",
   },
   placeholder: {
     position: "absolute",
@@ -51,7 +52,7 @@ const styles = {
     left: "0",
     opacity: "0.3",
     letterSpacing: "0.06em",
-    fontSize: "3.6vw",
+    fontSize: "4vw",
   },
   textareaWrap: {
     display: "block",

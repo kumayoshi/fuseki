@@ -24,7 +24,9 @@ li {
 
 input,
 textarea,
-button {
+button,
+select,
+option {
   border: none;
   background-color: none;
   -webkit-appearance: none;

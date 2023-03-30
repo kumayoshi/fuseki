@@ -98,5 +98,6 @@ const styles = {
     display: "block",
     minHeight: "42vw",
     lineHeight: "2em",
+    fontSize: "4vw",
   },
 };

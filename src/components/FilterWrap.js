@@ -1,8 +1,7 @@
 import React from "react";
+import Filter from "../components/Filter";
 
-import FilterDate from "../components/Filterdate";
-
-const MemoFilter = ({
+const FilterWrap = ({
   categoryList,
   filterCategoryImg,
   filterCategoryChanged,
@@ -13,13 +12,16 @@ const MemoFilter = ({
   filterYearLabel,
   filterMonthChanged,
   filterClose,
+  filterDateArray,
+  filterYear,
+  filterMonth,
 }) => {
   return (
     // 絞り込みウィンドウ　全体
     <div style={styles.findWrap}>
       {/* 絞り込みモーダル */}
       <div style={styles.findModalWrap}>
-        <FilterDate
+        <Filter
           categoryList={categoryList}
           filterCategoryChanged={filterCategoryChanged}
           modalType={modalType}
@@ -27,6 +29,9 @@ const MemoFilter = ({
           filterYearLabel={filterYearLabel}
           filterMonthChanged={filterMonthChanged}
           filterClose={filterClose}
+          filterDateArray={filterDateArray}
+          filterYear={filterYear}
+          filterMonth={filterMonth}
         />
       </div>
       {/* 検索ウィンドウ */}
@@ -63,7 +68,7 @@ const MemoFilter = ({
   );
 };
 
-export default MemoFilter;
+export default FilterWrap;
 
 const styles = {
   findWrap: {
