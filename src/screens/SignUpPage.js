@@ -36,6 +36,7 @@ const SignUpPage = () => {
           mailadress: signUpMail,
           password: signUpPass,
           signInUserId: currentUser?.uid,
+          filterDate: { 0: ["-"] },
         });
       });
       // userlistにユーザを追加後　オンボーディングページに飛ぶ

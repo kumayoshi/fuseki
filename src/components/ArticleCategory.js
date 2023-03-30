@@ -41,7 +41,11 @@ const ArticleCategory = ({ itemCategory, onChange, categoryList }) => {
         {categoryList.map((categoryItem) => {
           const categoryItemId = categoryItem.categoryId;
           return (
-            <option value={categoryItemId} key={categoryItemId}>
+            <option
+              style={styles.selectItem}
+              value={categoryItemId}
+              key={categoryItemId}
+            >
               {categoryItem.categoryName}
             </option>
           );
@@ -110,5 +114,10 @@ const styles = {
     width: "100vw",
     margin: "0 calc(50% - 50vw)",
     display: "block",
+    fontSize: "4vw",
+  },
+  selectItem: {
+    display: "flex",
+    justifyContent: "space-between",
   },
 };
