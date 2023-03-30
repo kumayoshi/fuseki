@@ -3,19 +3,28 @@ import React, { useState, useEffect } from "react";
 import CommonStyles from "../assets/css/CommonStyles.css";
 // firebase
 import { auth, db } from "../firebase";
-import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 // library
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 // component
 import Header from "../components/Header";
 import MemoItem from "../components/MemoItem";
-import MemoFilter from "../components/MemoFilter";
+import FilterWrap from "../components/FilterWrap";
 import {
   memoTextLengthLimit,
   dateFormatCombert,
   categoryStoneImgReference,
   itemCategoryFind,
+  getObjectKey,
+  getObjectValue,
 } from "../utils/MemoProcess";
 // 新しい記事追加ボタンの
 import newArticle from "../assets/images/newMemo.svg";
@@ -34,7 +43,7 @@ const SignUpPage = () => {
   // 日付絞り込み時の日付保存用変数
   const [filterYearLabel, setFilterYearLabel] = useState("-");
   // 日付絞り込み時の日付保存用変数
-  const [filterYearArray, setFilterYearArray] = useState([]);
+  const [filterDateArray, setFilterDateArray] = useState([]);
   // 日付絞り込み時　年の保存用変数
   const [filterYear, setFilterYear] = useState("-");
   // 日付絞り込み時　月の保存用変数
@@ -45,10 +54,80 @@ const SignUpPage = () => {
   const [modalType, setModalType] = useState("none"); // none , date , category
   // memolistを一旦宣言する
   const [memoList, setMemoList] = useState([]);
+  // 新規記事作成後　flug
+  const [updateFilterDateFlug, setUpdateFilterDateFlug] = useState(true);
   // filter後の配列　保存用のステート
   const [memoListChaged, setMemoListChaged] = useState([]);
   // navigate
   const navigate = useNavigate();
+  // location
+  const location = useLocation();
+  let locationType = location.state !== null ? location.state : "";
+
+  const updateUserFilterDate = (getUserListId, newFilterDateObject) => {
+    const userDocRef = doc(db, "userList", getUserListId);
+    console.log(getUserListId, newFilterDateObject);
+    updateDoc(userDocRef, newFilterDateObject)
+      .then(() => {
+        setUpdateFilterDateFlug(false);
+      })
+      .catch((error) => {
+        console.error("Error updating document: ", error);
+      });
+  };
+  //
+  const setUserFilterDate = (getUserListId, memoItem, userFilterDate) => {
+    console.log(userFilterDate);
+    const addedMemoItemDate = memoItem.date;
+    const memoDateArray = addedMemoItemDate.split("/");
+    const memoDateYear = memoDateArray[0].toString();
+    const memoDateMonth = memoDateArray[1].toString();
+    const userFilterDateKeyArray = getObjectKey(userFilterDate);
+    const userFilterDateValueArray = getObjectValue(userFilterDate);
+    let userFilterDateObject = { filterDate: {} };
+    userFilterDateKeyArray.forEach((key, index) => {
+      userFilterDateObject.filterDate[key] = userFilterDateValueArray[index];
+    });
+    if (userFilterDateKeyArray.indexOf(memoDateYear) === -1) {
+      userFilterDateObject.filterDate[memoDateYear] = ["-", memoDateMonth];
+      updateUserFilterDate(getUserListId, userFilterDateObject);
+    } else if (
+      userFilterDateValueArray[userFilterDateValueArray.length - 1].indexOf(
+        memoDateMonth
+      ) === -1
+    ) {
+      console.log("array :", userFilterDateValueArray);
+      console.log("month Array before : ", userFilterDateObject);
+      userFilterDateObject.filterDate[memoDateYear].push(memoDateMonth);
+      console.log("month Array after : ", userFilterDateObject);
+      updateUserFilterDate(getUserListId, userFilterDateObject);
+    }
+  };
+
+  // ユーザリストから日付データを取得
+  const getDateFilter = (userId, memoItem) => {
+    const userQuery = query(
+      collection(db, "userList"),
+      where("signInUserId", "in", [userId])
+    );
+    getDocs(userQuery).then((querySnapshot) => {
+      let getFilterYearArray = [];
+      let getUserListId = "";
+      querySnapshot.docs.forEach((doc) => {
+        const { filterDate } = doc.data();
+        getFilterYearArray = filterDate;
+        getUserListId = doc.id;
+      });
+      setFilterDateArray(getFilterYearArray);
+      if (
+        locationType !== "" &&
+        location.state.type === "added" &&
+        updateFilterDateFlug === true
+      ) {
+        setUserFilterDate(getUserListId, memoItem, getFilterYearArray);
+      }
+    });
+  };
 
   // メモ一覧の記事データベース
   const setMemoArray = async (userID) => {
@@ -73,8 +152,10 @@ const SignUpPage = () => {
       );
       setMemoList(getMemoArray);
       setMemoListChaged(getMemoArray);
+      getDateFilter(userID, getMemoArray[0]);
     });
   };
+
   // カテゴリー一覧の記事データベース
   const memoCategoryGetFunc = async () => {
     const categoryQuery = query(collection(db, "categoryList"));
@@ -137,6 +218,8 @@ const SignUpPage = () => {
     setFilterYearLabel("-");
     setMemoListChaged(memoList);
     setFilterCategoryId("");
+    setFilterYear("-");
+    setFilterMonth("-");
   };
 
   // 年、月で絞り込み関数
@@ -148,8 +231,10 @@ const SignUpPage = () => {
           (memoListItem) => memoListItem.categoryId === filterCategoryId
         );
         setMemoListChaged(filterMemoList);
+        setFilterYearText(label);
       } else {
         setMemoListChaged(memoList);
+        setFilterYearText(label);
       }
     } else if (label !== "-") {
       if (label.indexOf("-")) {
@@ -184,28 +269,14 @@ const SignUpPage = () => {
   // -----月を選択した際
   const filterMonthChanged = (item) => {
     if (item !== "none") {
-      const monthValue = filterYearLabel + "/" + item.target.value;
+      const monthText =
+        item.target.value !== "-" ? "/" + item.target.value : "";
+      const monthValue = filterYearLabel + monthText;
       filterDateAble(monthValue);
       setFilterMonth(item.target.value);
     } else {
       filterDateDisable();
     }
-  };
-
-  // -----ユーザリストから日付データを取得
-  const getDateFilter = (userId) => {
-    const userQuery = query(
-      collection(db, "userList"),
-      where("signInUserId", "in", [userId])
-    );
-    getDocs(userQuery).then((querySnapshot) => {
-      let getFilterYearArray = [];
-      querySnapshot.docs.forEach((doc) => {
-        const { filterDate } = doc.data();
-        getFilterYearArray = filterDate;
-      });
-      setFilterYearArray(getFilterYearArray);
-    });
   };
 
   // ログイン監視、メモ・カテゴリー読み込み関数群
@@ -216,7 +287,6 @@ const SignUpPage = () => {
       }
       setUser(currentUser);
       setMemoArray(currentUser.uid);
-      getDateFilter(currentUser.uid);
     });
     memoCategoryGetFunc();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -251,11 +321,11 @@ const SignUpPage = () => {
             <img src={newArticle} alt="" />
           </a>
         </div>
-        <MemoFilter
+        <FilterWrap
           categoryList={categoryList}
           filterCategoryImg={filterCategoryImg}
           filterCategoryChanged={(item) => filterCategoryChanged(item)}
-          filterYearArray={filterYearArray && filterYearArray}
+          filterDateArray={filterDateArray && filterDateArray}
           filterYearText={filterYearText}
           filterYearLabel={filterYearLabel}
           filterYear={filterYear}

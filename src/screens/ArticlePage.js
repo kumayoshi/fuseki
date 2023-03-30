@@ -149,7 +149,7 @@ const ArticlePage = () => {
       });
       navigate("/memolist/");
     } catch (e) {
-      console.error("Error adding document: ", e);
+      console.error("Error adding document: ", e.message);
     }
   };
   // メモ新規作成
@@ -163,7 +163,9 @@ const ArticlePage = () => {
         categoryId: itemCategory ? itemCategory : "n3TrqVLKqtdVhWxvK59r",
         userId: user.uid,
       });
-      navigate("/memolist/");
+      navigate("/memolist/", {
+        state: { type: "added" },
+      });
     } catch (e) {
       console.error("Error adding document: ", e);
     }

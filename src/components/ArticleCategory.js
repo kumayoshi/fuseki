@@ -16,8 +16,6 @@ const ArticleCategory = ({ itemCategory, onChange, categoryList }) => {
     itemCategory = defaultItemCategory.categoryId;
   }
 
-  console.log(categoryList);
-
   return (
     <div style={styles.wrap}>
       <label

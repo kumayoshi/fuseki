@@ -23,6 +23,15 @@ export const dateFormatCombert = (date) => {
   return `${year}/${month}/${day}`;
 };
 
+// 配列の key　を取得
+export const getObjectKey = (array) => {
+  return Object.keys(array);
+};
+// 配列の value　を取得
+export const getObjectValue = (array) => {
+  return Object.values(array);
+};
+
 // 画像の変数を配列に格納
 export const categoryStoneArray = [
   stoneNormal,
