@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import SignButton from "../components/SignButton";
 import SignForm from "../components/SignForm";
+import PasswordResetValidate from "../components/PasswordResetValidate";
 
 const SignInPage = () => {
   // メールアドレス、パスワード格納用の変数
@@ -17,6 +18,8 @@ const SignInPage = () => {
   const [pass, setPass] = useState("");
   // nanigate用の変数
   const navigate = useNavigate();
+  // メール送信失敗時のエラー内容格納
+  const [error, setError] = useState("");
 
   // SignIn用の関数
   const signInSubmit = async (e) => {
@@ -33,11 +36,11 @@ const SignInPage = () => {
         // 失敗すればアラート
         const errorCode = error.code;
         if (errorCode === "auth/user-not-found") {
-          alert(
+          setError(
             "入力していただいたメールアドレス、パスワードでは該当するユーザがいません。\n一度違うものを試してみてください。"
           );
         } else if (errorCode === "auth/invalid-email") {
-          alert(
+          setError(
             "メールアドレスの形式が正しくありません。\n一度見直して再度試していただけませんか？"
           );
         }
@@ -56,11 +59,12 @@ const SignInPage = () => {
     <div className={CommonStyles.wrap}>
       <Header currentPage="ログイン" user={""} />
       <div style={styles.wrap}>
+        {error !== "" && (
+          <PasswordResetValidate judge="error" errorMessage={error} />
+        )}
         <div>
           <SignForm
-            // mailValue={mail}
             onMailChange={(text) => setMail(text)}
-            // passValue={pass}
             onPassChange={(text) => setPass(text)}
           />
 
